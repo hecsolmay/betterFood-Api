@@ -1,16 +1,17 @@
-const UserServices = require("../libs/usersCreation");
+const UserServices = require("../services/user.services");
 const jwtoken = require("../libs/tokens");
 const Response = require("../common/response");
+
 const singUp = async (req, res) => {
   try {
-    let { username, email, password, roles } = req.body;
+    let { username, email, password, rol } = req.body;
     const externalToken = req.get("Authorization")?.split(" ").pop();
 
     // TODO: Implementar la imagen de perfil al token y a la base de datos
 
     if (externalToken) {
-      const googleUser = jwtoken.tokenVerify(externalToken);
-      email = googleUser.email;
+      const externalUser = jwtoken.tokenDecode(externalToken);
+      email = externalUser.email;
       username = externalToken.username;
     }
 
@@ -18,10 +19,10 @@ const singUp = async (req, res) => {
       username,
       email,
       password,
-      roles
+      rol
     );
 
-    const token = jwtoken.tokenSign(savedUser);
+    const token = jwtoken.tokenSign(savedUser, rol);
 
     res.status(200).json({ token: token });
   } catch (error) {
@@ -35,8 +36,8 @@ const signIn = async (req, res) => {
     const externalToken = req.get("Authorization")?.split(" ").pop();
 
     if (externalToken) {
-      const googleUser = jwtoken.tokenVerify(externalToken);
-      email = googleUser.email;
+      const externalUser = jwtoken.tokenDecode(externalToken);
+      email = externalUser.email;
     }
 
     const user = await UserServices.searchUser(email);
@@ -49,8 +50,8 @@ const signIn = async (req, res) => {
     if (!matchPassword)
       return res.status(401).json({ token: null, message: "invalid password" });
 
-    const token = jwtoken.tokenSign(user);
-    res.json({ token, user: user });
+    const token = jwtoken.tokenSign(user, user.rol.name);
+    res.json({ token });
   } catch (error) {
     Response.error(res);
   }

@@ -1,13 +1,26 @@
 const Product = require("../models/Product");
 const Response = require("../common/response");
 const createError = require("http-errors");
-
-const {Types: {ObjectId: ObjectId}} = require('mongoose');
+const services = require("../services/product.services");
+const paginate = require("../common/paginate");
 
 const getProducts = async (req, res) => {
   try {
-    let products = await Product.find({}).populate("categories");
-    Response.succes(res, 200, "Listado de Productos", products);
+    let { limit, page } = paginate.getQuery(req);
+    const query = await getQueryParams(req);
+    const sort = getQuerySort(req);
+
+    const products = await Product.paginate(
+      query,
+      paginate.getOptions({ limit, page, populate: "", sort: sort })
+    );
+    const info = paginate.info(products);
+
+    if (page > info.totalPages)
+      return res.status(404).json({ error: "there is nothing here" });
+
+    const { results } = products;
+    paginate.success(res, 200, "ok", info, results);
   } catch (error) {
     console.error(error);
     Response.error(res);
@@ -16,9 +29,8 @@ const getProducts = async (req, res) => {
 
 const getProduct = async (req, res) => {
   try {
-    const id = ObjectId(req.params);
-    const product = await Product.findById(id);
-    // let product = await Product.findById(id).populate("categories");
+    const { id } = req.params;
+    const product = await Product.findById(id).populate("categories");
 
     if (!product) return Response.error(res, createError.NotFound());
 
@@ -31,17 +43,8 @@ const getProduct = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const { name, imgURL, price, personalize, categories } = req.body;
-    const newProduct = new Product({
-      name,
-      imgURL,
-      price,
-      personalize,
-      categories,
-    });
-    const productSave = await newProduct.save();
-
-    Response.succes(res, 201, "Producto Creado Con exito", productSave);
+    const newProduct = await services.createProduct(req);
+    Response.succes(res, 201, "Producto Creado Con exito", newProduct);
   } catch (error) {
     console.error(error);
     Response.error(res);
@@ -50,8 +53,15 @@ const createProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   try {
-    const id = req.params;
+    const { id } = req.params;
     const deletedProduct = await Product.findByIdAndDelete(id);
+    await services.deleteProdCate(deletedProduct.categories);
+
+    if (!deletedProduct)
+      return res
+        .status(400)
+        .json({ message: "No se pudo encontrar el producto" });
+
     Response.succes(res, 200, `Producto ${id} eliminado `, deletedProduct);
   } catch (error) {
     console.error(error);
@@ -60,9 +70,49 @@ const deleteProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  res.json("Actualizando Productos");
+  try {
+    const updatedProduct = await services.update(req);
+
+    if (!updatedProduct)
+      return res
+        .status(400)
+        .json({ message: "No se pudo encontrar el producto" });
+
+    Response.succes(
+      res,
+      200,
+      `Producto ${updatedProduct.name} actualizado `,
+      updatedProduct
+    );
+  } catch (error) {
+    Response.error(res);
+  }
 };
 
+async function getQueryParams(req) {
+  let query = {};
+  const { categories, name, offert } = req.query;
+
+  if (categories) {
+  }
+  if (offert) query.offert = { $gt: 0 };
+
+  if (name) query.name = { $regex: name, $options: "i" };
+
+  console.log(query);
+  return query;
+}
+
+function getQuerySort(req) {
+  const { ordered, price } = req.query;
+  let query = {};
+
+  if (ordered) query.ordered = ordered;
+  if (price) query.price = price;
+
+  console.log(query);
+  return query;
+}
 module.exports = {
   getProducts,
   getProduct,

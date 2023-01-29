@@ -1,21 +1,35 @@
 const Category = require("../models/Category");
 const Response = require("../common/response");
 const createError = require("http-errors");
+const paginate = require("../common/paginate");
 
 const getCategories = async (req, res) => {
   try {
-    console.log("Buscando categorias ");
-    let Categories = await Category.find({});
-    console.log(Categories);
-    Response.succes(res, 200, "Listado de categorias", Categories);
+    let { limit, page } = paginate.getQuery(req);
+    const query = getQueryParams(req);
+    const sort = getQuerySort(req);
+
+    let Categories = await Category.paginate(
+      query,
+      paginate.getOptions({ limit, page, sort })
+    );
+
+    const info = paginate.info(Categories);
+
+    if (page > info.totalPages)
+      return res.status(404).json({ error: "there is nothing here" });
+
+    const { results } = Categories;
+    paginate.success(res, 200, "ok", info, results);
   } catch (error) {
     console.error(error);
     Response.error(res);
   }
 };
+
 const getCategory = async (req, res) => {
+  const { id } = req.params;
   try {
-    const id = req.params;
     let category = await Category.findById(id);
 
     if (!category) return Response.error(res, createError.NotFound());
@@ -26,22 +40,67 @@ const getCategory = async (req, res) => {
     Response.error(res);
   }
 };
-const createCategory = async (req, res) => {
-  try {
-    const { name } = req.body;
-    const newCategory = new Category({ name });
-    const categorySave = await newCategory.save();
 
+const createCategory = async (req, res) => {
+  const { name, imgURL } = req.body;
+  const newCategory = new Category({ name, imgURL });
+
+  try {
+    const categorySave = await newCategory.save();
     Response.succes(res, 201, "Categoria Creado Con exito", categorySave);
   } catch (error) {
     console.error(error);
     Response.error(res);
   }
 };
-const deleteCategory = (req, res) => {};
-const updateCategory = (req, res) => {
-  res.json("Actualizando Categoria");
+
+const deleteCategory = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedCategory = await Category.findByIdAndDelete(id);
+
+    if (!deletedCategory) return Response.error(res, createError.NotFound());
+
+    Response.succes(res, 200, `Categoria ${id} eliminada`, deletedCategory);
+  } catch (error) {
+    Response.error(res);
+  }
 };
+
+const updateCategory = async (req, res) => {
+  const { name, imgURL } = req.body;
+  const { id } = req.params;
+  try {
+    const updatedCategory = await Category.findByIdAndUpdate(
+      id,
+      {
+        $set: { name, imgURL },
+      },
+      { new: true }
+    );
+    Response.succes(res, 200, `Categoria ${id} actualizada`, updatedCategory);
+  } catch (error) {
+    Response.error(res);
+  }
+};
+
+function getQueryParams(req) {
+  let query = {};
+  const { name } = req.query;
+
+  if (name) query.name = { $regex: name, $options: "i" };
+
+  return query;
+}
+
+function getQuerySort(req) {
+  const { totalproducts } = req.query;
+  let query = {};
+
+  if (totalproducts) query.totalProducts = totalproducts;
+
+  return query;
+}
 
 module.exports = {
   getCategories,

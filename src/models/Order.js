@@ -9,17 +9,11 @@ const orderSchema = new Schema(
         totalProduct: { type: Number },
       },
     ],
+    totalQuantity: {type: Number},
     numMesa: { type: Number },
     total: { type: Number, default: 0 },
   },
   { timestamps: true, versionKey: false }
 );
-
-orderSchema.pre("save", (next) => {
-  let total = 0;
-  this.products.map((product) => (total += product.totalProduct));
-  this.total = total;
-  next();
-});
 
 module.exports = model("Order", orderSchema);

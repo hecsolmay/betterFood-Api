@@ -1,6 +1,8 @@
-const { verifyToken, canEdit, isAdmin,canSale } = require("./authJwt");
+const { verifyToken, canEdit, isAdmin, canSale } = require("./authJwt");
 const { emailExisted } = require("./emailVerification");
 const { checkRoleExisted } = require("./verifySignUp");
+const { checkValidCategory } = require("./verifyCategory");
+const { verifyStatusDeleteOrder, verifyUpdateSale } = require("./verifyOrder");
 
 module.exports = {
   verifyToken,
@@ -9,4 +11,7 @@ module.exports = {
   isAdmin,
   checkRoleExisted,
   canSale,
+  checkValidCategory,
+  verifyStatusDeleteOrder,
+  verifyUpdateSale,
 };

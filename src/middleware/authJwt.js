@@ -1,33 +1,45 @@
 const jwtoken = require("../libs/tokens");
 const User = require("../models/User");
+const Response = require("../common/response");
 
 const verifyToken = async (req, res, next) => {
-  const token = req.get("Authorization")?.split(" ").pop();
+  const authorization = req.get("authorization");
 
-  if (!token) return res.status(400).json({ message: "no token provided" });
+  if (!authorization || !authorization.toLowerCase().startsWith("bearer"))
+    return res.status(400).json({ error: "not authorization token valid" });
 
-  const decoded = jwtoken.tokenVerify(token);
+  const token = authorization.split(" ").pop();
 
-  const user = await User.findOne(
-    { email: decoded.email },
-    { password: 0 }
-  ).populate("roles");
+  let decoded = null;
 
-  if (!user) return res.status(401).json({ message: "Unauthorized" });
+  try {
+    decoded = jwtoken.tokenVerify(token);
+  } catch (error) {
+    return res.status(401).json({ error: "no token provided or invalid" });
+  }
 
-  req.user = user;
+  if (!token || !decoded.id)
+    return res.status(400).json({ error: "no token provided or invalid" });
+
+  try {
+    const user = await User.findById(decoded.id, { password: 0 }).populate(
+      "rol"
+    );
+    if (!user) return res.status(401).json({ message: "Unauthorized" });
+    req.user = user;
+  } catch (error) {
+    return Response.error(res);
+  }
+
   next();
 };
 
 const canEdit = async (req, res, next) => {
   const { user } = req;
 
-  const roles = user.roles;
+  const rol = user.rol.name;
 
-  const canEdit = roles.some(
-    (role) => role.name === "admin" || role.name === "moderator"
-  );
-
+  const canEdit = rol === "admin" || rol === "moderator";
   if (!canEdit) return res.status(403).json({ message: "Forbiden" });
 
   next();
@@ -35,10 +47,9 @@ const canEdit = async (req, res, next) => {
 
 const isAdmin = async (req, res, next) => {
   const { user } = req;
-  console.log(user);
-  const roles = user.roles;
+  const rol = user.rol;
 
-  const isAdmin = roles.some((role) => role.name === "admin");
+  const isAdmin = rol.name === "admin";
 
   if (!isAdmin)
     return res.status(403).json({ message: "Forbiden: Require admin role" });
@@ -49,14 +60,9 @@ const isAdmin = async (req, res, next) => {
 const canSale = async (req, res, next) => {
   const { user } = req;
 
-  const roles = user.roles;
-
-  const canSale = roles.some(
-    (role) =>
-      role.name === "admin" ||
-      role.name === "moderator" ||
-      role.name === "employee"
-  );
+  const rol = user.rol.name;
+  console.log(rol);
+  const canSale = rol === "admin" || rol === "moderator" || rol === "employee";
 
   if (!canSale)
     return res.status(403).json({ message: "Forbiden you can't make a sale" });

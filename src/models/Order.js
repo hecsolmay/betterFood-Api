@@ -6,7 +6,7 @@ const orderSchema = new Schema(
       {
         idProduct: { ref: "Product", type: Schema.Types.ObjectId },
         cantidad: { type: Number, default: 1 },
-        totalProduct: { type: Number },
+        totalByProd: { type: Number },
       },
     ],
     totalQuantity: {type: Number},

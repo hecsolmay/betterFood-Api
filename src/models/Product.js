@@ -4,15 +4,18 @@ const mongoosePaginate = require("mongoose-paginate-v2");
 const productSchema = new Schema(
   {
     name: { type: String, required: true },
-    imgURL: { type: String, required: true },
+    // imgURL: { type: String, required: true },
+    imgURL: { type: String },
     price: { type: Number, required: true },
     description: { type: String, required: true },
-    ingredentsInclude: [{ type: String }],
-    personalize: {
-      extra: [{ type: String }],
-      remove: [{ type: String }],
-    },
-    offert: { type: Number, default: 0 },
+    ingredents: [
+      {
+        name: { type: String },
+        required: { type: Boolean, default: true },
+        extraPrice: { type: Number, default: 0 },
+      },
+    ],
+    ofert: { type: Number, default: 0 },
     categories: [
       {
         type: Schema.Types.ObjectId,

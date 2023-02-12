@@ -15,6 +15,7 @@ const verifyToken = async (req, res, next) => {
   try {
     decoded = jwtoken.tokenVerify(token);
   } catch (error) {
+    console.log(error);
     return res.status(401).json({ error: "no token provided or invalid" });
   }
 

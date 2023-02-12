@@ -1,5 +1,11 @@
 const { Router } = require("express");
 const productsController = require("../controllers/products.controller");
+
+const multer = require("multer");
+const storage = multer.memoryStorage();
+
+const upload = multer({ storage });
+
 const {
   verifyToken,
   canEdit,

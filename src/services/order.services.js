@@ -19,7 +19,7 @@ const createOrderAndUpdateProd = async (
 ) => {
   const productsUpdate = updateProd(products, foundProducts);
 
-  const newOrder = new Order({ products, numMesa, total, totalQuantity });
+  const newOrder = new Order({ products, numMesa, total, totalQuantity,numMesa });
   let savedOrder = await newOrder.save();
 
   const newSale = new Sale({ order: savedOrder._id });

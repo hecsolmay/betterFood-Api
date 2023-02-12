@@ -3,17 +3,7 @@ const Product = require("../models/Product");
 
 const createProduct = async (req) => {
   const add = 1;
-  const {
-    name,
-    imgURL,
-    price,
-    personalize,
-    description,
-    ingredentsInclude,
-    categories,
-  } = req.body;
-
-  console.log(req.categories);
+  const { name, imgURL, price, description, categories, ingredents } = req.body;
 
   const updatePipeline = req.categories.map((c) => {
     let sum = c.totalProducts + 1;
@@ -29,10 +19,9 @@ const createProduct = async (req) => {
     name,
     imgURL,
     price,
-    personalize,
+    ingredents,
     categories,
     description,
-    ingredentsInclude,
   });
   const bulkWrite = await Category.bulkWrite(updatePipeline);
 
@@ -40,13 +29,27 @@ const createProduct = async (req) => {
 };
 
 const update = async (req) => {
-  const { name, imgURL, price, personalize, categories, offert } = req.body;
+  const {
+    name,
+    imgURL,
+    price,
+    description,
+    categories,
+    ingredents
+  } = req.body;
   const { id } = req.params;
 
   return await Product.findByIdAndUpdate(
     id,
     {
-      $set: { name, imgURL, price, personalize, categories, offert },
+      $set: {
+        name,
+        imgURL,
+        price,
+        description,
+        categories,
+        ingredents
+      },
     },
     { new: true }
   );

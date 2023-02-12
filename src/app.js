@@ -1,5 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require('cors');
 const { createRoles } = require("./libs/initialSetup");
 
 const authorization = require("./routes/auth.routes");
@@ -14,6 +15,7 @@ const app = express();
 createRoles();
 
 app.use(express.json());
+app.use(cors());
 
 app.use(morgan("dev"));
 

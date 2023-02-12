@@ -24,7 +24,23 @@ const createUser = async (username, email, password, rol) => {
 };
 
 const searchUser = async (email) => {
-  return await User.findOne({ email: email }).populate("rol");
+  return await User.findOne({ email: email }).populate("rol", {
+    name: 1,
+    _id: 0,
+  });
+};
+
+const cleanUser = (user) => {
+  const { _id, username, email, picture, rol, createdAt, updatedAt } = user;
+  return {
+    id: _id,
+    username,
+    email,
+    picture,
+    rol,
+    createdAt,
+    updatedAt,
+  };
 };
 
 const comparePassword = async (password, userPassword) => {
@@ -35,4 +51,5 @@ module.exports = {
   createUser,
   comparePassword,
   searchUser,
+  cleanUser,
 };

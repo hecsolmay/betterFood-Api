@@ -3,7 +3,6 @@ const { emailExisted } = require("./emailVerification");
 const { checkRoleExisted } = require("./verifySignUp");
 const { checkValidCategory } = require("./verifyCategory");
 const { verifyStatusDeleteOrder, verifyUpdateSale } = require("./verifyOrder");
-const { upload} = require("./uploadImg");
 
 module.exports = {
   verifyToken,
@@ -15,5 +14,4 @@ module.exports = {
   checkValidCategory,
   verifyStatusDeleteOrder,
   verifyUpdateSale,
-  upload
 };

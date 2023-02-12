@@ -1,6 +1,12 @@
+
+
 const myCustomLabels = {
   docs: "results",
   page: "currentPage",
+  hasNextPage: "next",
+  hasPrevPage: "prev",
+  totalPages: "total",
+  totalDocs: "count",
 };
 
 const info = (paginateResults) => {
@@ -9,9 +15,10 @@ const info = (paginateResults) => {
     currentPage,
     nextPage,
     prevPage,
-    hasPrevPage,
-    hasNextPage,
-    totalPages,
+    next,
+    prev,
+    total,
+    count
   } = paginateResults;
 
   return {
@@ -19,16 +26,17 @@ const info = (paginateResults) => {
     currentPage,
     nextPage,
     prevPage,
-    hasPrevPage,
-    hasNextPage,
-    totalPages,
+    next,
+    prev,
+    total,
+    count
   };
 };
 
 const getQuery = (req) => {
   let { limit = 10 } = req.query;
 
-  if (limit < 0 || limit > 10) {
+  if (limit < 0 || limit > 100) {
     limit = 10;
   }
 

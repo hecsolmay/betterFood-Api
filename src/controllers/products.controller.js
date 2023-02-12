@@ -12,7 +12,15 @@ const getProducts = async (req, res) => {
 
     const products = await Product.paginate(
       query,
-      paginate.getOptions({ limit, page, populate: "", sort: sort })
+      paginate.getOptions({
+        limit,
+        page,
+        populate: {
+          path: "categories",
+          select: "_id, name",
+        },
+        sort: sort,
+      })
     );
     const info = paginate.info(products);
 

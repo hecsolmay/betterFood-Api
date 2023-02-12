@@ -56,9 +56,7 @@ const deleteOrder = async (req, res) => {
 };
 
 const postOrder = async (req, res) => {
-  const { products, numMesa } = req.body;
-  let total = 0;
-  let totalQuantity = 0;
+  const { products, numMesa, totalQuantity } = req.body;
 
   try {
     const foundProducts = await services.searchProducts(products);
@@ -67,15 +65,9 @@ const postOrder = async (req, res) => {
         .status(400)
         .json({ message: "No se pudieron encontrar todos los productos" });
 
-    foundProducts.map((pf) => {
-      let i = products.findIndex((p) => p.idProduct == pf._id);
-      let offert = roundToTwo(pf.offert / 100) * pf.price;
-      products[i].totalProduct = roundToTwo(
-        (pf.price - offert) * products[i].cantidad
-      );
-      totalQuantity += products[i].cantidad;
-      total += products[i].totalProduct;
-    });
+    let total = 0;
+
+    products.map(p => total += p.totalByProd)
 
     const savedOrder = await services.createOrderAndUpdateProd(
       products,
@@ -84,8 +76,6 @@ const postOrder = async (req, res) => {
       totalQuantity,
       foundProducts
     );
-
-    console.log(savedOrder.createdAt.toLocaleDateString());
 
     Response.succes(res, 201, "Orden creada", savedOrder);
   } catch (error) {

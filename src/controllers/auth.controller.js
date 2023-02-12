@@ -24,7 +24,9 @@ const singUp = async (req, res) => {
 
     const token = jwtoken.tokenSign(savedUser, rol);
 
-    res.status(200).json({ token: token });
+    const user = UserServices.cleanUser(savedUser);
+
+    res.status(200).json({ token, user });
   } catch (error) {
     return Response.error(res);
   }
@@ -40,18 +42,27 @@ const signIn = async (req, res) => {
       email = externalUser.email;
     }
 
-    const user = await UserServices.searchUser(email);
-    if (!user) return res.status(400).json({ message: "User not Found" });
+    const userFound = await UserServices.searchUser(email);
+    if (!userFound)
+      return res.status(400).json({ message: "invalid password or User" });
 
     const matchPassword = externalToken
       ? true
-      : await UserServices.comparePassword(password, user.password);
+      : await UserServices.comparePassword(password, userFound.password);
 
     if (!matchPassword)
-      return res.status(401).json({ token: null, message: "invalid password" });
+      return res
+        .status(400)
+        .json({ token: null, message: "invalid password or User" });
 
-    const token = jwtoken.tokenSign(user, user.rol.name);
-    res.json({ token });
+    console.log(userFound.rol.name);
+    const token = jwtoken.tokenSign(userFound, userFound.rol.name);
+
+    const user = UserServices.cleanUser(userFound);
+
+    console.log(user);
+
+    res.json({ token, user });
   } catch (error) {
     Response.error(res);
   }

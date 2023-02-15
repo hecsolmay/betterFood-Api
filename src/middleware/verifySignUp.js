@@ -1,4 +1,4 @@
-const ROLES = ["admin", "user", "moderator", "employee"];
+const ROLES = ["admin", "user", "moderator"];
 
 const checkRoleExisted = (req, res, next) => {
   const { rol } = req.body;

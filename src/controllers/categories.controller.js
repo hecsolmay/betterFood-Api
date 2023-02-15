@@ -1,7 +1,10 @@
 const Category = require("../models/Category");
 const Response = require("../common/response");
-const createError = require("http-errors");
+const createHttpError = require("http-errors");
 const paginate = require("../common/paginate");
+const { apiURL } = require("../config/config");
+
+const path = `${apiURL}/category`;
 
 const getCategories = async (req, res) => {
   try {
@@ -14,7 +17,7 @@ const getCategories = async (req, res) => {
       paginate.getOptions({ limit, page, sort })
     );
 
-    const info = paginate.info(Categories);
+    const info = paginate.info(Categories, path);
 
     if (page > info.totalPages)
       return res.status(404).json({ error: "there is nothing here" });
@@ -32,7 +35,7 @@ const getCategory = async (req, res) => {
   try {
     let category = await Category.findById(id);
 
-    if (!category) return Response.error(res, createError.NotFound());
+    if (!category) return Response.error(res, createHttpError.NotFound());
 
     Response.succes(res, 200, `Categoria ${id}`, category);
   } catch (error) {
@@ -59,7 +62,7 @@ const deleteCategory = async (req, res) => {
   try {
     const deletedCategory = await Category.findByIdAndDelete(id);
 
-    if (!deletedCategory) return Response.error(res, createError.NotFound());
+    if (!deletedCategory) return Response.error(res, createHttpError.NotFound());
 
     Response.succes(res, 200, `Categoria ${id} eliminada`, deletedCategory);
   } catch (error) {
@@ -68,13 +71,13 @@ const deleteCategory = async (req, res) => {
 };
 
 const updateCategory = async (req, res) => {
-  const { name, imgURL } = req.body;
+  const { name, imgURL, active } = req.body;
   const { id } = req.params;
   try {
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
       {
-        $set: { name, imgURL },
+        $set: { name, imgURL, active },
       },
       { new: true }
     );

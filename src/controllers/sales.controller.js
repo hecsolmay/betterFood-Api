@@ -1,6 +1,9 @@
 const Sale = require("../models/Sale");
 const Response = require("../common/response");
 const paginate = require("../common/paginate");
+const { apiURL } = require("../config/config");
+
+const path = `${apiURL}/sale`;
 
 const getSales = async (req, res) => {
   try {
@@ -14,7 +17,7 @@ const getSales = async (req, res) => {
       paginate.getOptions({ limit, page, sort, populate: "order" })
     );
 
-    const info = paginate.info(sales);
+    const info = paginate.info(sales,path);
 
     if (page > info.totalPages)
       return res.status(404).json({ error: "there is nothing here" });
@@ -55,7 +58,7 @@ const updateSale = async (req, res) => {
   const updatedSale = await Sale.findByIdAndUpdate(
     sale._id,
     { $set: { paid: true, change, moneyReceived } },
-    { new: true }
+    { new: true, populate: "order" }
   );
 
   Response.succes(res, 201, `Update sale ${sale._id}`, updatedSale);

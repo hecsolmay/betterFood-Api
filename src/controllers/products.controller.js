@@ -1,8 +1,18 @@
 const Product = require("../models/Product");
 const Response = require("../common/response");
-const createError = require("http-errors");
+const createHttpError = require("http-errors");
 const services = require("../services/product.services");
 const paginate = require("../common/paginate");
+const { apiURL } = require("../config/config");
+
+const path = `${apiURL}/product`;
+
+const populateOptions = [
+  {
+    path: "categories",
+    select: { _id: 1, name: 1 },
+  },
+];
 
 const getProducts = async (req, res) => {
   try {
@@ -15,14 +25,11 @@ const getProducts = async (req, res) => {
       paginate.getOptions({
         limit,
         page,
-        populate: {
-          path: "categories",
-          select: "_id, name",
-        },
+        populate: populateOptions,
         sort: sort,
       })
     );
-    const info = paginate.info(products);
+    const info = paginate.info(products,path);
 
     if (page > info.totalPages)
       return res.status(404).json({ error: "there is nothing here" });
@@ -40,7 +47,7 @@ const getProduct = async (req, res) => {
     const { id } = req.params;
     const product = await Product.findById(id).populate("categories");
 
-    if (!product) return Response.error(res, createError.NotFound());
+    if (!product) return Response.error(res, createHttpError.NotFound());
 
     Response.succes(res, 200, `Producto ${id}`, product);
   } catch (error) {
@@ -99,13 +106,13 @@ const updateProduct = async (req, res) => {
 
 async function getQueryParams(req) {
   let query = {};
-  const { categories, name, offert } = req.query;
+  const { category, q, offert } = req.query;
 
-  if (categories) {
+  if (category) {
   }
   if (offert) query.offert = { $gt: 0 };
 
-  if (name) query.name = { $regex: name, $options: "i" };
+  if (q) query.name = { $regex: q, $options: "i" };
 
   console.log(query);
   return query;

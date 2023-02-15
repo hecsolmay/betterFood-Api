@@ -2,6 +2,7 @@ const UserServices = require("../services/user.services");
 const jwtoken = require("../libs/tokens");
 const Response = require("../common/response");
 
+
 const singUp = async (req, res) => {
   try {
     let { username, email, password, rol } = req.body;

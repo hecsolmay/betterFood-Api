@@ -2,6 +2,10 @@ const User = require("../models/User");
 const Response = require("../common/response");
 const Role = require("../models/Role");
 const paginate = require("../common/paginate");
+const createHttpError = require("http-errors");
+const { apiURL } = require("../config/config");
+
+const path = `${apiURL}/user`;
 
 const getUsers = async (req, res) => {
   try {
@@ -9,13 +13,12 @@ const getUsers = async (req, res) => {
 
     const query = await getQueryParams(req);
 
-
     const users = await User.paginate(
       query,
       paginate.getOptions({ limit, page, populate: "rol", select: "-password" })
     );
 
-    const info = paginate.info(users);
+    const info = paginate.info(users, path);
 
     if (page > info.totalPages)
       return res.status(404).json({ error: "there is nothing here" });
@@ -23,6 +26,7 @@ const getUsers = async (req, res) => {
     const { results } = users;
     paginate.success(res, 200, "ok", info, results);
   } catch (error) {
+    console.error(error);
     Response.error(res);
   }
 };
@@ -31,30 +35,51 @@ const getUser = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id, { password: 0 }).populate("rol");
+    if (!user) return Response.error(res, createHttpError.NotFound());
+
     Response.succes(res, 200, `Usuario ${id}`, user);
   } catch (error) {
+    console.error(error);
     Response.error(res);
   }
 };
 
 const updateUserRole = async (req, res) => {
+  const { rol, active } = req.body;
   try {
-    const { rol } = req.body;
     const { id } = req.params;
 
-    if (!rol) return res.status(400).json({ message: "No role provided" });
-
-    const foundRol = await Role.find({ name: rol });
-    const newRoles = foundRol._id;
-
     const updatedUser = await User.findByIdAndUpdate(id, {
-      $set: { rol: newRoles },
-    }).populate("rol");
+      $set: { rol, active },
+    })
+      .populate("rol")
+      .select({ password: 0 });
 
     res
       .status(204)
-      .json({ message: `Usuario ${updatedUser.email} actualizado` });
+      .json({ message: `Usuario ${updatedUser.username} actualizado` });
   } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
+const updateUser = async (req, res) => {
+  const { username, email, picture } = req.body;
+  try {
+    const { id } = req.params;
+
+    const updatedUser = await User.findByIdAndUpdate(id, {
+      $set: { username, email, picture },
+    })
+      .populate("rol")
+      .select({ password: 0 });
+
+    res
+      .status(204)
+      .json({ message: `Usuario ${updatedUser.username} actualizado` });
+  } catch (error) {
+    console.error(error);
     Response.error(res);
   }
 };
@@ -82,4 +107,5 @@ module.exports = {
   getUsers,
   getUser,
   updateUserRole,
+  updateUser,
 };

@@ -3,6 +3,9 @@ const Sale = require("../models/Sale");
 const Response = require("../common/response");
 const services = require("../services/order.services");
 const paginate = require("../common/paginate");
+const { apiURL } = require("../config/config");
+
+const path = `${apiURL}/order`;
 
 const getOrders = async (req, res) => {
   try {
@@ -10,17 +13,17 @@ const getOrders = async (req, res) => {
     const query = getQueryParams(req);
     const sort = getQuerySort();
 
-    const sales = await Sale.paginate(
+    const orders = await Order.paginate(
       query,
-      paginate.getOptions({ limit, page, sort, populate: "order" })
+      paginate.getOptions({ limit, page, sort })
     );
 
-    const info = paginate.info(sales);
+    const info = paginate.info(orders,path);
 
     if (page > info.totalPages)
       return res.status(404).json({ error: "there is nothing here" });
 
-    const { results } = sales;
+    const { results } = orders;
     paginate.success(res, 200, "ok", info, results);
   } catch (error) {
     Response.error(res);
@@ -65,27 +68,17 @@ const postOrder = async (req, res) => {
         .status(400)
         .json({ message: "No se pudieron encontrar todos los productos" });
 
-    let total = 0;
+    const newOrder = new Order({ products, numMesa });
+    let savedOrder = await newOrder.save();
 
-    products.map(p => total += p.totalByProd)
-
-    const savedOrder = await services.createOrderAndUpdateProd(
-      products,
-      numMesa,
-      total,
-      totalQuantity,
-      foundProducts
-    );
+    const newSale = new Sale({ order: savedOrder._id });
+    await newSale.save();
 
     Response.succes(res, 201, "Orden creada", savedOrder);
   } catch (error) {
     Response.error(res);
   }
 };
-
-function roundToTwo(num) {
-  return Math.round(num * 100) / 100;
-}
 
 function getQueryParams(req) {
   let query = {};

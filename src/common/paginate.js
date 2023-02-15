@@ -5,21 +5,24 @@ const myCustomLabels = {
   page: "currentPage",
   hasNextPage: "next",
   hasPrevPage: "prev",
-  totalPages: "total",
-  totalDocs: "count",
+  totalPages: "totalPages",
+  totalDocs: "items",
 };
 
-const info = (paginateResults) => {
-  const {
+const info = (paginateResults, path = "") => {
+  let {
     limit,
     currentPage,
     nextPage,
     prevPage,
     next,
     prev,
-    total,
-    count
+    totalPages,
+    items
   } = paginateResults;
+
+  prevPage = prev ?  `${path}?page=${prevPage}` : null
+  nextPage = next ?  `${path}?page=${nextPage}` : null
 
   return {
     limit,
@@ -28,8 +31,8 @@ const info = (paginateResults) => {
     prevPage,
     next,
     prev,
-    total,
-    count
+    totalPages,
+    items
   };
 };
 

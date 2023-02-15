@@ -7,10 +7,7 @@ const router = Router();
 router
   .get("/", [verifyToken, isAdmin], userController.getUsers)
   .get("/:id", [verifyToken, isAdmin], userController.getUser)
-  .put(
-    "/:id",
-    [verifyToken, isAdmin, checkRoleExisted],
-    userController.updateUserRole
-  );
+  .put("/change/:id", [verifyToken, isAdmin], userController.updateUserRole)
+  .put("/:id", userController.updateUser);
 
 module.exports = router;

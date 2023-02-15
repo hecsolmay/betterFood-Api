@@ -1,11 +1,9 @@
 const { model, Schema } = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 
-const categorieSchema = new Schema(
+const ingredentSchema = new Schema(
   {
-    name: { type: String, required: true },
-    imgURL: { type: String, required: true },
-    totalProducts: { type: Number, default: 0 },
+    name: { type: String },
     active: { type: Number, default: 1 },
   },
   {
@@ -14,13 +12,13 @@ const categorieSchema = new Schema(
   }
 );
 
-categorieSchema.plugin(mongoosePaginate);
+ingredentSchema.plugin(mongoosePaginate);
 
-categorieSchema.set("toJSON", {
+ingredentSchema.set("toJSON", {
   transform: function (doc, ret) {
     ret.id = doc._id;
     delete ret._id;
   },
 });
 
-module.exports = model("Category", categorieSchema);
+module.exports = model("ingredent", ingredentSchema);

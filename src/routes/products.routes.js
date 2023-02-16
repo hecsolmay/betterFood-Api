@@ -5,7 +5,7 @@ const {
   verifyToken,
   canEdit,
   isAdmin,
-  checkValidCategory,
+  checkValidCategory,verifyExistingIngredents
 } = require("../middleware");
 
 const router = Router();
@@ -15,12 +15,12 @@ router
   .get("/:id", productsController.getProduct)
   .post(
     "/",
-    [verifyToken, canEdit, checkValidCategory],
+    [verifyToken, canEdit, checkValidCategory,verifyExistingIngredents],
     productsController.createProduct
   )
   .put(
     "/:id",
-    [verifyToken, canEdit, checkValidCategory],
+    [verifyToken, canEdit, checkValidCategory,verifyExistingIngredents],
     productsController.updateProduct
   )
   .delete("/:id", [verifyToken, isAdmin], productsController.deleteProduct);

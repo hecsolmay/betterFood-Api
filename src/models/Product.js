@@ -9,20 +9,20 @@ const productSchema = new Schema(
     imgURL: { type: String },
     price: { type: Number, required: true },
     description: { type: String, required: true },
-    ingredents: [
-      {
-        name: { type: String },
-        required: { type: Boolean, default: true },
-        extraPrice: { type: Number, default: 0 },
-      },
-    ],
     // ingredents: [
     //   {
-    //     id: { type: Schema.Types.ObjectID, ref: "ingredent" },
+    //     name: { type: String },
     //     required: { type: Boolean, default: true },
     //     extraPrice: { type: Number, default: 0 },
     //   },
     // ],
+    ingredents: [
+      {
+        id: { type: Schema.Types.ObjectID, ref: "Ingredent" },
+        required: { type: Boolean, default: true },
+        extraPrice: { type: Number, default: 0 },
+      },
+    ],
     ofert: { type: Number, default: 0 },
     categories: [
       {
@@ -77,7 +77,19 @@ productSchema.set("toJSON", {
         name: c.name,
       };
     });
-    delete ret.ingredents._id;
+
+    ret.ingredents = doc.ingredents.map((i) => {
+      if (i.id)
+        return {
+          id: i.id.id,
+          name: i.id.name,
+          required: i.required,
+          extraPrice: i.extraPrice,
+        };
+    });
+
+    ret.ingredents = ret.ingredents.filter((i) => i !== undefined);
+    // delete ret.ingredents._id;
     delete ret._id;
   },
 });

@@ -21,4 +21,4 @@ ingredentSchema.set("toJSON", {
   },
 });
 
-module.exports = model("ingredent", ingredentSchema);
+module.exports = model("Ingredent", ingredentSchema);

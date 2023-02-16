@@ -3,7 +3,10 @@ const { emailExisted } = require("./emailVerification");
 const { checkRoleExisted } = require("./verifySignUp");
 const { checkValidCategory, checkUniqueCategory } = require("./verifyCategory");
 const { verifyStatusDeleteOrder, verifyUpdateSale } = require("./verifyOrder");
-const { checkUniqueIngredent } = require("./verifyIngredent");
+const {
+  checkUniqueIngredent,
+  verifyExistingIngredents,
+} = require("./verifyIngredent");
 
 module.exports = {
   verifyToken,
@@ -17,4 +20,5 @@ module.exports = {
   verifyUpdateSale,
   checkUniqueCategory,
   checkUniqueIngredent,
+  verifyExistingIngredents,
 };

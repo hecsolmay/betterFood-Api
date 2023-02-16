@@ -14,6 +14,21 @@ const checkUniqueIngredent = async (req, res, next) => {
   next();
 };
 
+const verifyExistingIngredents = async (req, res, next) => {
+  const { ingredents } = req.body;
+
+  if (ingredents) {
+    let id = ingredents.map(i => i.id) 
+    const foundIngredents = await Ingredent.find({ _id: { $in: id } });
+
+    if (foundIngredents.length !== ingredents.length)
+      return res.status(400).json({ message: "ingredent not valid" });
+  }
+
+  next();
+};
+
 module.exports = {
   checkUniqueIngredent,
+  verifyExistingIngredents,
 };

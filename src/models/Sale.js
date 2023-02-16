@@ -1,6 +1,5 @@
 const { model, Schema } = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
-const Order = require("../models/Order");
 
 const saleSchema = new Schema(
   {
@@ -12,10 +11,13 @@ const saleSchema = new Schema(
 );
 
 saleSchema.virtual("change").get(function () {
-  if (this.moneyReceived >= this.order.total) {
-    return this.moneyReceived - this.order.total;
+  let total = this.order ? this.order.total : 0;
+  console.log(this.order);
+  if (this.moneyReceived >= total) {
+    return this.moneyReceived - total;
   }
-  return 0
+
+  return 0;
 });
 
 saleSchema.plugin(mongoosePaginate);

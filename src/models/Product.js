@@ -55,6 +55,19 @@ productSchema.pre("save", async function () {
   }
 });
 
+productSchema.pre("findOneAndDelete", async function () {
+  console.log(this.getFilter());
+  const Product = await this.model.findOne(this.getFilter());
+
+  for (let i = 0; i < Product.categories.length; i++) {
+    let categoryId = Product.categories[i];
+
+    await Category.findByIdAndUpdate(categoryId, {
+      $inc: { totalProducts: -1 },
+    });
+  }
+});
+
 productSchema.set("toJSON", {
   transform: function (doc, ret) {
     ret.id = doc._id;

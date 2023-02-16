@@ -25,6 +25,7 @@ const getSales = async (req, res) => {
     const { results } = sales;
     paginate.success(res, 200, "ok", info, results);
   } catch (error) {
+    console.error(error);
     Response.error(res);
   }
 };

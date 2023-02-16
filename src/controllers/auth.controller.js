@@ -1,12 +1,13 @@
 const UserServices = require("../services/user.services");
 const jwtoken = require("../libs/tokens");
 const Response = require("../common/response");
-
+const PascalCase = require("../libs/pascalCase");
 
 const singUp = async (req, res) => {
   try {
     let { username, email, password, rol } = req.body;
     const externalToken = req.get("Authorization")?.split(" ").pop();
+    let picture = "";
 
     // TODO: Implementar la imagen de perfil al token y a la base de datos
 
@@ -14,14 +15,18 @@ const singUp = async (req, res) => {
       const externalUser = jwtoken.tokenDecode(externalToken);
       email = externalUser.email;
       username = externalToken.username;
+      picture = externalToken.picture;
     }
 
-    const savedUser = await UserServices.createUser(
-      username,
+    email = email.toLowerCase().trim();
+
+    const savedUser = await UserServices.createUser({
+      username: PascalCase(username),
       email,
       password,
-      rol
-    );
+      rol,
+      picture,
+    });
 
     const token = jwtoken.tokenSign(savedUser, rol);
 

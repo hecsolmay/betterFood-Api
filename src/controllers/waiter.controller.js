@@ -3,6 +3,7 @@ const Response = require("../common/response");
 const paginate = require("../common/paginate");
 const { apiURL } = require("../config/config");
 const createHttpError = require("http-errors");
+const PascalCase = require("../libs/pascalCase");
 
 const path = `${apiURL}/waiter`;
 
@@ -50,7 +51,11 @@ const createWaiter = async (req, res) => {
   const { name, lastName } = req.body;
   let { birthdate } = req.body;
   birthdate = new Date(birthdate);
-  const newWaiter = new Waiter({ name, lastName, birthdate });
+  const newWaiter = new Waiter({
+    name: PascalCase(name),
+    lastName: PascalCase(lastName),
+    birthdate,
+  });
 
   try {
     const savedWaiter = await newWaiter.save();
@@ -69,7 +74,7 @@ const deleteWaiter = async (req, res) => {
 
     if (!deletedWaiter) return Response.error(res, createHttpError.NotFound());
 
-    Response.succes(res, 200, `Mesero ${id} eliminada`, deletedWaiter);
+    Response.succes(res, 200, `Mesero ${id} eliminado`, deletedWaiter);
   } catch (error) {
     console.error(error);
     Response.error(res);
@@ -77,9 +82,12 @@ const deleteWaiter = async (req, res) => {
 };
 
 const updateWaiter = async (req, res) => {
-  const { name, lastName, active } = req.body;
+  let { name, lastName, active } = req.body;
   let { birthdate } = req.body;
   birthdate ? (birthdate = new Date(birthdate)) : null;
+  name ? (name = PascalCase(name)) : null;
+  lastName ? (lastName = PascalCase(lastName)) : null;
+
   const { id } = req.params;
 
   try {

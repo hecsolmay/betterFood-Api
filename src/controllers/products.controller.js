@@ -1,9 +1,9 @@
 const Product = require("../models/Product");
 const Response = require("../common/response");
 const createHttpError = require("http-errors");
-const services = require("../services/product.services");
 const paginate = require("../common/paginate");
 const { apiURL } = require("../config/config");
+const PascalCase = require("../libs/pascalCase");
 
 const path = `${apiURL}/product`;
 
@@ -29,7 +29,7 @@ const getProducts = async (req, res) => {
         sort: sort,
       })
     );
-    const info = paginate.info(products,path);
+    const info = paginate.info(products, path);
 
     if (page > info.totalPages)
       return res.status(404).json({ error: "there is nothing here" });
@@ -57,9 +57,19 @@ const getProduct = async (req, res) => {
 };
 
 const createProduct = async (req, res) => {
+  const { name, imgURL, price, description, categories, ingredents } = req.body;
   try {
-    const newProduct = await services.createProduct(req);
-    Response.succes(res, 201, "Producto Creado Con exito", newProduct);
+    const newProduct = new Product({
+      name: PascalCase(name),
+      imgURL,
+      price,
+      ingredents,
+      categories,
+      description,
+    });
+
+    const savedProduct = await newProduct.save();
+    Response.succes(res, 201, "Producto Creado Con exito", savedProduct);
   } catch (error) {
     console.error(error);
     Response.error(res);
@@ -70,7 +80,6 @@ const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const deletedProduct = await Product.findByIdAndDelete(id);
-    await services.deleteProdCate(deletedProduct.categories);
 
     if (!deletedProduct)
       return res
@@ -85,8 +94,26 @@ const deleteProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
+  const { name, imgURL, price, description, categories, ingredents, active } =
+    req.body;
   try {
-    const updatedProduct = await services.update(req);
+    const { id } = req.params;
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          name: PascalCase(name),
+          imgURL,
+          price,
+          description,
+          categories,
+          ingredents,
+          active,
+        },
+      },
+      { new: true }
+    );
 
     if (!updatedProduct)
       return res

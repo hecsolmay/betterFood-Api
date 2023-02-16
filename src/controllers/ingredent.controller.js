@@ -3,6 +3,7 @@ const Response = require("../common/response");
 const paginate = require("../common/paginate");
 const { apiURL } = require("../config/config");
 const createHttpError = require("http-errors");
+const PascalCase = require("../libs/pascalCase");
 
 const path = `${apiURL}/ingredent`;
 
@@ -39,7 +40,7 @@ const getIngredent = async (req, res) => {
     const ingredent = await Ingredent.findById(id);
     if (!ingredent) Response.error(res, createHttpError.NotFound());
 
-    Response.succes(res, 200, `Mesero ${id}`, Ingredent);
+    Response.succes(res, 200, `ingrediente ${id}`, ingredent);
   } catch (error) {
     console.error(error);
     Response.error(res);
@@ -48,10 +49,10 @@ const getIngredent = async (req, res) => {
 
 const createIngredent = async (req, res) => {
   const { name } = req.body;
-  const newIngredent = new Ingredent({ name });
+  const newIngredent = new Ingredent({ name: PascalCase(name) });
 
   try {
-    const savedIngredent = newIngredent.save();
+    const savedIngredent = await newIngredent.save();
     Response.succes(res, 201, "Ingrediente creado con exito", savedIngredent);
   } catch (error) {
     console.error(error);
@@ -75,9 +76,10 @@ const deleteIngredent = async (req, res) => {
 };
 
 const updateIngredent = async (req, res) => {
-  const { name, active } = req.body;
+  let { name, active } = req.body;
   const { id } = req.params;
 
+  if(name) name = PascalCase(name)
   try {
     const updatedIngredent = await Ingredent.findByIdAndUpdate(
       id,

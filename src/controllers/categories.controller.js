@@ -3,6 +3,7 @@ const Response = require("../common/response");
 const createHttpError = require("http-errors");
 const paginate = require("../common/paginate");
 const { apiURL } = require("../config/config");
+const PascalCase = require("../libs/pascalCase");
 
 const path = `${apiURL}/category`;
 
@@ -46,7 +47,7 @@ const getCategory = async (req, res) => {
 
 const createCategory = async (req, res) => {
   const { name, imgURL } = req.body;
-  const newCategory = new Category({ name, imgURL });
+  const newCategory = new Category({ name: PascalCase(name), imgURL });
 
   try {
     const categorySave = await newCategory.save();
@@ -62,7 +63,8 @@ const deleteCategory = async (req, res) => {
   try {
     const deletedCategory = await Category.findByIdAndDelete(id);
 
-    if (!deletedCategory) return Response.error(res, createHttpError.NotFound());
+    if (!deletedCategory)
+      return Response.error(res, createHttpError.NotFound());
 
     Response.succes(res, 200, `Categoria ${id} eliminada`, deletedCategory);
   } catch (error) {
@@ -71,8 +73,10 @@ const deleteCategory = async (req, res) => {
 };
 
 const updateCategory = async (req, res) => {
-  const { name, imgURL, active } = req.body;
+  let { name, imgURL, active } = req.body;
   const { id } = req.params;
+
+  if (name) name = PascalCase(name);
   try {
     const updatedCategory = await Category.findByIdAndUpdate(
       id,

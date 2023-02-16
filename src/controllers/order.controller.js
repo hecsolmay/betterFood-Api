@@ -18,7 +18,7 @@ const getOrders = async (req, res) => {
       paginate.getOptions({ limit, page, sort })
     );
 
-    const info = paginate.info(orders,path);
+    const info = paginate.info(orders, path);
 
     if (page > info.totalPages)
       return res.status(404).json({ error: "there is nothing here" });
@@ -47,7 +47,8 @@ const getOrder = async (req, res) => {
 const deleteOrder = async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedOrder = await services.deleteOrder(id);
+    // const deletedOrder = await services.deleteOrder(id);
+    const deletedOrder = await Order.findByIdAndDelete(id);
 
     if (!deletedOrder)
       return res.status(400).json({ message: "No se pudo encontrar la orden" });
@@ -59,7 +60,7 @@ const deleteOrder = async (req, res) => {
 };
 
 const postOrder = async (req, res) => {
-  const { products, numMesa, totalQuantity } = req.body;
+  const { products, numMesa } = req.body;
 
   try {
     const foundProducts = await services.searchProducts(products);

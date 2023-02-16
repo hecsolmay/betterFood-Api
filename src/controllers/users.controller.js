@@ -4,6 +4,7 @@ const Role = require("../models/Role");
 const paginate = require("../common/paginate");
 const createHttpError = require("http-errors");
 const { apiURL } = require("../config/config");
+const PascalCase = require("../libs/pascalCase");
 
 const path = `${apiURL}/user`;
 
@@ -70,7 +71,7 @@ const updateUser = async (req, res) => {
     const { id } = req.params;
 
     const updatedUser = await User.findByIdAndUpdate(id, {
-      $set: { username, email, picture },
+      $set: { username: PascalCase(username), email, picture },
     })
       .populate("rol")
       .select({ password: 0 });

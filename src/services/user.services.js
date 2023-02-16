@@ -1,10 +1,11 @@
 const User = require("../models/User");
 const Role = require("../models/Role");
 
-const createUser = async (username, email, password, rol) => {
+const createUser = async ({ username, email, password, rol, picture = "" }) => {
   const newUser = new User({
     username,
     email,
+    picture,
   });
 
   if (password) newUser.password = await User.encryptPassword(password);

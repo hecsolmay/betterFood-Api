@@ -47,7 +47,6 @@ const getOrder = async (req, res) => {
 const deleteOrder = async (req, res) => {
   const { id } = req.params;
   try {
-    // const deletedOrder = await services.deleteOrder(id);
     const deletedOrder = await Order.findByIdAndDelete(id);
 
     if (!deletedOrder)

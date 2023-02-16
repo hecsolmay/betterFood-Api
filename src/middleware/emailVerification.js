@@ -1,9 +1,10 @@
 const User = require("../models/User");
 
 const emailExisted = async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
+  let query = req.body.email.trim().toLowerCase();
+  const user = await User.findOne({ email: query });
 
-  if (user) return res.status(400).json({ message: "User already exist" });
+  if (user) return res.status(409).json({ message: "User already exist" });
 
   next();
 };

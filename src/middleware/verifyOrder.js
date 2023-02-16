@@ -4,8 +4,10 @@ const Order = require("../models/Order");
 const verifyStatusDeleteOrder = async (req, res, next) => {
   const { id } = req.params;
 
+  // const sale = await Sale.findOne({ order: id });
   const sale = await Sale.findOne({ order: id });
 
+  console.log(sale);
   if (sale.paid)
     return res
       .status(400)

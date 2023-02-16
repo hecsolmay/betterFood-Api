@@ -10,6 +10,12 @@ const path = `${apiURL}/product`;
 const populateOptions = [
   {
     path: "categories",
+    match: { active: 1 },
+    select: { _id: 1, name: 1 },
+  },
+  {
+    path: "ingredents.id",
+    match: { active: 1 },
     select: { _id: 1, name: 1 },
   },
 ];
@@ -45,7 +51,7 @@ const getProducts = async (req, res) => {
 const getProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id).populate("categories");
+    const product = await Product.findById(id).populate(populateOptions);
 
     if (!product) return Response.error(res, createHttpError.NotFound());
 
@@ -69,7 +75,8 @@ const createProduct = async (req, res) => {
     });
 
     const savedProduct = await newProduct.save();
-    Response.succes(res, 201, "Producto Creado Con exito", savedProduct);
+    const product = await Product.findById(savedProduct._id).populate(populateOptions);
+    Response.succes(res, 201, "Producto Creado Con exito", product);
   } catch (error) {
     console.error(error);
     Response.error(res);

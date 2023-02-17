@@ -3,6 +3,54 @@ const mongoosePaginate = require("mongoose-paginate-v2");
 const Product = require("./Product");
 const Sale = require("./Sale");
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Order:
+ *       type: object
+ *       properties:
+ *        products: 
+ *          type: array
+ *          items: 
+ *            type: object
+ *            properties:
+ *              idProduct: 
+ *                type: string 
+ *              quantity:
+ *                type: number 
+ *        numMesa: 
+ *          type: number
+ *       required:
+ *        - products 
+ *        - numMesa 
+ * 
+ *     OrderResponse:
+ *       type: object
+ *       properties:
+ *        id:
+ *          type: string
+ *        products: 
+ *          type: array
+ *          properties:
+ *            idProduct: 
+ *              type: string 
+ *            quantity:
+ *              type: number 
+ *        numMesa: 
+ *          type: number
+ *        totalQuantity:
+ *          type: number
+ *        total:
+ *          type: number
+ *        createdAt:
+ *          type: string
+ *        updatedAt:
+ *          type: string
+ *   
+ */
+
+
 const orderSchema = new Schema(
   {
     products: [

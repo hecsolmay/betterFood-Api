@@ -82,9 +82,10 @@ const postOrder = async (req, res) => {
 
 function getQueryParams(req) {
   let query = {};
-  const { paid } = req.query;
+  const { q } = req.query;
 
-  if (paid) query.paid = paid == 1;
+  // if (paid) query.paid = paid == 1;
+  if (q) query.numMesa = q;
 
   return query;
 }

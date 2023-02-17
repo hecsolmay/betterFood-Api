@@ -38,7 +38,7 @@ const getIngredent = async (req, res) => {
   try {
     const { id } = req.params;
     const ingredent = await Ingredent.findById(id);
-    if (!ingredent) Response.error(res, createHttpError.NotFound());
+    if (!ingredent) return Response.error(res, createHttpError.NotFound());
 
     Response.succes(res, 200, `ingrediente ${id}`, ingredent);
   } catch (error) {
@@ -79,7 +79,7 @@ const updateIngredent = async (req, res) => {
   let { name, active } = req.body;
   const { id } = req.params;
 
-  if(name) name = PascalCase(name)
+  if (name) name = PascalCase(name);
   try {
     const updatedIngredent = await Ingredent.findByIdAndUpdate(
       id,
@@ -88,6 +88,9 @@ const updateIngredent = async (req, res) => {
       },
       { new: true }
     );
+
+    if (!updatedIngredent)
+      return Response.error(res, createHttpError.NotFound());
     Response.succes(
       res,
       200,

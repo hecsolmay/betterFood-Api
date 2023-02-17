@@ -2,20 +2,150 @@ const { model, Schema } = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 const Category = require("./Category");
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Product:
+ *       type: object
+ *       properties:
+ *        name:
+ *          type: string
+ *        price:
+ *          type: number
+ *        imgURL:
+ *          type: string
+ *          format: url
+ *        description:
+ *          type: string
+ *        categories:
+ *          type: array
+ *          items: 
+ *            type: string
+ *        ingredents:
+ *          type: array
+ *          items: 
+ *            type: object
+ *            properties: 
+ *              id:
+ *                type: string
+ *              required:
+ *                type: boolean
+ *              extraPrice:
+ *                type: number
+ *       required:
+ *        - name
+ *        - price
+ *        - description
+ *        - imgURL
+ * 
+ *     ProductResponse:
+ *       type: object
+ *       properties:
+ *        id:
+ *          type: string
+ *          description: id de la categoria
+ *        name:
+ *          type: string
+ *        price:
+ *          type: number
+ *        imgURL:
+ *          type: string
+ *          format: url
+ *        description:
+ *          type: string
+ *        categories:
+ *          type: array
+ *          items: 
+ *            type: string
+ *        ingredents:
+ *          type: array
+ *          items: 
+ *            type: object
+ *            properties: 
+ *              id:
+ *                type: string
+ *              required:
+ *                type: boolean
+ *              extraPrice:
+ *                type: number
+ *        ofert:
+ *          type: number
+ *        ordered:
+ *          type: number
+ *        active:
+ *          type: number
+ *        createdAt:
+ *          type: string
+ *          description: La fecha en la que se creo
+ *        updatedAt:
+ *          type: string
+ *          description: La fecha en la que se modifico
+ *       example:
+ *          name: Agua Chile de Rib Eye,
+ *          imgURL:  https://www.foodandwine.com/thmb/lgXOxVZGdiZZtRArldeWqpQxKLY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/ribeye-aquanchile-ft-recipe0819-01ae271fbc3b46e79063c2bbf617ad17.jpg ,
+ *          price: 450,
+ *          description: Rico agua chile de ribe eye para cargar energias ,
+ *          ofert: 0,
+ *          categories: []
+ *          ordered: 1,
+ *          Ingredents: []
+ *          createdAt: 2023-02-08T16:53:14.265Z,
+ *          updatedAt: 2023-02-13T18:16:20.673Z,
+ *          active: 1,
+ *          ingredents: []
+ *          id: 63e3d37a645ed8f34ba3c1df 
+ * 
+ *     ProductUpdate:
+ *       type: object
+ *       properties:
+ *        name:
+ *          type: string
+ *        price:
+ *          type: number
+ *        imgURL:
+ *          type: string
+ *          format: url
+ *        description:
+ *          type: string
+ *        categories:
+ *          type: array
+ *          items: 
+ *            type: string
+ *        ingredents:
+ *          type: array
+ *          items: 
+ *            type: object
+ *            properties: 
+ *              id:
+ *                type: string
+ *              required:
+ *                type: boolean
+ *              extraPrice:
+ *                type: number
+ *        ofert:
+ *          type: number
+ *        active:
+ *          type: number
+ *       example:
+ *          name: Agua Chile de Rib Eye,
+ *          imgURL:  https://www.foodandwine.com/thmb/lgXOxVZGdiZZtRArldeWqpQxKLY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/ribeye-aquanchile-ft-recipe0819-01ae271fbc3b46e79063c2bbf617ad17.jpg ,
+ *          price: 450,
+ *          description: Rico agua chile de ribe eye para cargar energias ,
+ *          ofert: 0,
+ *          categories: []
+ *          ordered: 1,
+ *          Ingredents: []
+ *          active: 1,
+ *          ingredents: []
+ */
+
 const productSchema = new Schema(
   {
     name: { type: String, required: true },
-    // imgURL: { type: String, required: true },
     imgURL: { type: String },
     price: { type: Number, required: true },
     description: { type: String, required: true },
-    // ingredents: [
-    //   {
-    //     name: { type: String },
-    //     required: { type: Boolean, default: true },
-    //     extraPrice: { type: Number, default: 0 },
-    //   },
-    // ],
     ingredents: [
       {
         id: { type: Schema.Types.ObjectID, ref: "Ingredent" },

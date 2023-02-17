@@ -4,6 +4,7 @@ const createHttpError = require("http-errors");
 const paginate = require("../common/paginate");
 const { apiURL } = require("../config/config");
 const PascalCase = require("../libs/pascalCase");
+const Category = require("../models/Category");
 
 const path = `${apiURL}/product`;
 
@@ -75,7 +76,9 @@ const createProduct = async (req, res) => {
     });
 
     const savedProduct = await newProduct.save();
-    const product = await Product.findById(savedProduct._id).populate(populateOptions);
+    const product = await Product.findById(savedProduct._id).populate(
+      populateOptions
+    );
     Response.succes(res, 201, "Producto Creado Con exito", product);
   } catch (error) {
     console.error(error);
@@ -143,6 +146,12 @@ async function getQueryParams(req) {
   const { category, q, offert } = req.query;
 
   if (category) {
+    let foundCategory = await Category.findOne({
+      name: { $regex: category, $options: "i" },
+    });
+
+    if(foundCategory)
+    query.categories = foundCategory._id
   }
   if (offert) query.offert = { $gt: 0 };
 

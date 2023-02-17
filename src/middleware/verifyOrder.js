@@ -8,6 +8,8 @@ const verifyStatusDeleteOrder = async (req, res, next) => {
   const sale = await Sale.findOne({ order: id });
 
   console.log(sale);
+
+  if (!sale) return res.status(400).json({ message: "Bad Request" });
   if (sale.paid)
     return res
       .status(400)

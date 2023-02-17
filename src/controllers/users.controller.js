@@ -86,11 +86,11 @@ const updateUser = async (req, res) => {
 };
 
 async function getQueryParams(req) {
-  let { username = "", email = "", rol = "" } = req.query;
+  let { q = "", email = "", rol = "" } = req.query;
   let query = {};
 
-  if (username && username.lenght > 3) {
-    query.username = { $regex: username, $options: "i" };
+  if (q && q.lenght > 3) {
+    query.username = { $regex: q, $options: "i" };
   }
   if (email && email.lenght > 3) {
     query.email = { $regex: username, $options: "i" };

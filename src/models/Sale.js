@@ -1,6 +1,47 @@
 const { model, Schema } = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     SaleUpdate:
+ *       type: object
+ *       properties:
+ *        moneyReceived:
+ *          type: number
+ *       example: 
+ *          moneyReceived: 450
+ *     SaleResponse:
+ *       type: object
+ *       properties:
+ *        id:
+ *          type: string
+ *        order:
+ *          type: object
+ *          properties: 
+ *            products:
+ *              type: array
+ *              items: 
+ *                type: object 
+ *                properties: 
+ *                  idProduct:
+ *                    type: string 
+ *                  quantity:
+ *                    type: number 
+ *        numMesa:
+ *          type: number
+ *        totalQuantity:
+ *          type: number
+ *        total:
+ *          type: number
+ *        createdAt:
+ *          type: string
+ *        updatedAt:
+ *          type: string
+ */
+
+
 const saleSchema = new Schema(
   {
     order: { ref: "Order", type: Schema.Types.ObjectId },

@@ -93,18 +93,18 @@ const updateCategory = async (req, res) => {
 
 function getQueryParams(req) {
   let query = {};
-  const { name } = req.query;
+  const { q } = req.query;
 
-  if (name) query.name = { $regex: name, $options: "i" };
+  if (q) query.name = { $regex: q, $options: "i" };
 
   return query;
 }
 
 function getQuerySort(req) {
-  const { totalproducts } = req.query;
+  const { sort } = req.query;
   let query = {};
 
-  if (totalproducts) query.totalProducts = totalproducts;
+  if (sort) query.totalProducts = sort == -1 ? sort : 1;
 
   return query;
 }

@@ -1,10 +1,13 @@
 const Product = require("../models/Product");
 
 const searchProducts = async (products) => {
-  const foundProducts = await Product.find({
-    _id: { $in: products.map((p) => p.idProduct) },
-  });
+  const foundProducts = products
+    ? await Product.find({
+        _id: { $in: products.map((p) => p.idProduct) },
+      })
+    : null;
 
+  if (foundProducts.length != products.length) return null;
   return foundProducts;
 };
 

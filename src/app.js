@@ -13,7 +13,7 @@ app.use(cors());
 app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
-  res.send("hola mundo");
+  res.send("Por favor accede a https://betterfood-api.up.railway.app/api/docs para ver la documentacion");
 });
 
 swaggerSetup(app);

@@ -4,7 +4,6 @@ const path = require("path");
 
 const allRoutes = path.join(__dirname, "routes/*.js");
 const allSchemas = path.join(__dirname, "models/*.js");
-console.log(allSchemas);
 
 const swaggerOptions = {
   definition: {

@@ -57,7 +57,7 @@
  *          application/json:
  *            schema:
  *              type: object
- *              $ref: '#/components/schemas/CategoryResponse'
+ *              $ref: '#/components/schemas/OrderDetailResponse'
  *      404:
  *        description: Not Found
  * 
@@ -69,7 +69,9 @@
  * /api/order/:
  *  post:
  *   summary: Crear una orden
- *   tags: [Order]
+ *   tags: 
+ *      - Order
+ *      - Mobile
  *   requestBody:
  *     required: true
  *     content:
@@ -78,13 +80,13 @@
  *           type: object
  *           $ref: '#/components/schemas/Order'
  *   responses:
- *     200:
- *       description: Success
+ *     201:
+ *       description: Success Create
  *       content: 
  *         application/json:
  *           schema:
  *             type: object
- *             $ref: '#/components/schemas/OrderResponse'
+ *             $ref: '#/components/schemas/Order'
  *     400:
  *       description: Bad Request
  *     401:

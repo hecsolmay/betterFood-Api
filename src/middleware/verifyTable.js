@@ -15,6 +15,22 @@ const uniqueTable = async (req, res, next) => {
   next();
 };
 
+const existedTable = async (req, res, next) => {
+  const { idTable } = req.body;
+  try {
+    if (idTable) {
+      const foundTable = await Table.findById(idTable);
+
+      if (!foundTable)
+        return res.status(404).json({ message: "No se encontro la mesa" });
+    }
+  } catch (error) {
+    return res.status(400).json({ message: "Bad Request" });
+  }
+
+  next();
+};
+
 const verifyWaiter = async (req, res, next) => {
   const { waiterId } = req.body;
 
@@ -27,4 +43,4 @@ const verifyWaiter = async (req, res, next) => {
   next();
 };
 
-module.exports = { uniqueTable, verifyWaiter };
+module.exports = { uniqueTable, verifyWaiter, existedTable };

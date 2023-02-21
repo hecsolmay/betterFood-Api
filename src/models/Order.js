@@ -2,6 +2,7 @@ const { model, Schema } = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 const Product = require("./Product");
 const Sale = require("./Sale");
+const Ingredent = require("./Ingredent");
 
 /**
  * @swagger
@@ -19,8 +20,22 @@ const Sale = require("./Sale");
  *                type: string
  *              quantity:
  *                type: number
- *        numMesa:
- *          type: number
+ *              extras:
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  properties:
+ *                    id:
+ *                      type: string
+ *                    extraPrice:
+ *                      type: number
+ *              remove:
+ *                type: array
+ *                items:
+ *                  id:
+ *                    type: string
+ *        idTable:
+ *          type: string
  *       required:
  *        - products
  *        - numMesa
@@ -28,25 +43,54 @@ const Sale = require("./Sale");
  *     OrderResponse:
  *       type: object
  *       properties:
- *        id:
- *          type: string
  *        products:
  *          type: array
- *          properties:
- *            idProduct:
- *              type: string
- *            quantity:
- *              type: number
- *        numMesa:
+ *          items:
+ *            type: object
+ *            properties:
+ *              idProduct:
+ *                type: string
+ *              quantity:
+ *                type: number
+ *        idTable:
  *          type: number
- *        totalQuantity:
- *          type: number
- *        total:
- *          type: number
- *        createdAt:
- *          type: string
- *        updatedAt:
- *          type: string
+ *
+ *     OrderDetailResponse:
+ *       type: object
+ *       properties:
+ *        products:
+ *          type: array
+ *          items:
+ *            type: object
+ *            properties:
+ *              quantity:
+ *                type: number
+ *              idProduct:
+ *                type: object
+ *                properties:
+ *                  id:
+ *                    type: string
+ *                  name:
+ *                    type: string
+ *                  imgURL:
+ *                    type: string
+ *                  price:
+ *                    type: number
+ *                  ofert:
+ *                    type: number
+ *                  ofertPrice:
+ *                    type: number
+ *       idTable:
+ *            type: object
+ *            properties:
+ *             id:
+ *               type: string
+ *             numMesa:
+ *               type: number
+ *             capacity:
+ *               type: number
+ *             waiterId:
+ *               type: string
  *
  */
 
@@ -55,11 +99,22 @@ const orderSchema = new Schema(
     products: [
       {
         idProduct: { ref: "Product", type: Schema.Types.ObjectId },
+        extras: [
+          {
+            id: { type: Schema.Types.ObjectId, ref: "Ingredent" },
+            extraPrice: { type: Number, default: 0 },
+          },
+        ],
+        remove: [
+          {
+            id: { type: Schema.Types.ObjectId, ref: "Ingredent" },
+          },
+        ],
         quantity: { type: Number, default: 1 },
       },
     ],
     totalQuantity: { type: Number },
-    numMesa: { type: Number },
+    idTable: { ref: "Table", type: Schema.Types.ObjectId },
     total: { type: Number, default: 0 },
   },
   { timestamps: true, versionKey: false }
@@ -77,12 +132,21 @@ orderSchema.pre("save", async function () {
   for (let i = 0; i < this.products.length; i++) {
     let productId = this.products[i].idProduct;
     let cantidad = this.products[i].quantity;
+    let extra = this.products[i].extras;
+
     const product = await Product.getProductById(productId);
     let price = product.price;
 
     if (product.ofert !== 0) {
       let discount = (price * product.ofert) / 100;
       price = price - discount.toFixed(2);
+    }
+
+    if (extra.length !== 0) {
+      for (let i = 0; i < extra.length; i++) {
+        const ingredentExtra = extra[i];
+        price += ingredentExtra.extraPrice;
+      }
     }
 
     total += price * cantidad;
@@ -116,9 +180,22 @@ orderSchema.set("toJSON", {
     ret.id = doc._id;
     if (ret.products.length !== 0) {
       ret.products = doc.products.map((p) => {
+        let extra = undefined;
+        let remove = undefined;
+        if (p.extras.length !== 0) {
+          extra = p.extras.map((e) => {
+            return { id: e.id, extraPrice: e.extraPrice };
+          });
+        }
+
+        if (p.remove.length !== 0) {
+          remove = p.remove.map((r) => r.id);
+        }
         return {
           idProduct: p.idProduct,
           quantity: p.quantity,
+          extra,
+          remove,
         };
       });
     }

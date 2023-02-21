@@ -7,7 +7,7 @@ const {
   checkUniqueIngredent,
   verifyExistingIngredents,
 } = require("./verifyIngredent");
-const { uniqueTable, verifyWaiter } = require("./verifyTable");
+const { uniqueTable, verifyWaiter, existedTable } = require("./verifyTable");
 
 module.exports = {
   verifyToken,
@@ -24,4 +24,5 @@ module.exports = {
   verifyExistingIngredents,
   uniqueTable,
   verifyWaiter,
+  existedTable,
 };

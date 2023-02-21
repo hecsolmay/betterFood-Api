@@ -262,7 +262,7 @@ const updateProduct = async (req, res) => {
         .status(400)
         .json({ message: "No se pudo encontrar el producto" });
 
-    return res.status(204);
+    return res.status(204).json();
   } catch (error) {
     Response.error(res);
   }

@@ -5,16 +5,15 @@ const {
   canEdit,
   verifyStatusDeleteOrder,
   canSale,
+  existedTable,
 } = require("../middleware");
 
 const router = Router();
 
-
-
 router
   .get("/", [verifyToken, canSale], orderController.getOrders)
   .get("/:id", [verifyToken, canSale], orderController.getOrder)
-  .post("/", orderController.postOrder)
+  .post("/", [existedTable], orderController.postOrder)
   .delete(
     "/:id",
     [verifyToken, canEdit, verifyStatusDeleteOrder],

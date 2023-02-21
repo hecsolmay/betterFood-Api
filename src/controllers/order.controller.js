@@ -32,8 +32,29 @@ const getOrders = async (req, res) => {
 
 const getOrder = async (req, res) => {
   try {
+    const selectProduct = {
+      description: 0,
+      categories: 0,
+      ordered: 0,
+      ingredents: 0,
+      createdAt: 0,
+      updatedAt: 0,
+      active: 0,
+    };
+
+    const selectTable = {
+      active: 0,
+      createdAt: 0,
+      updatedAt: 0,
+    };
     const { id } = req.params;
-    const order = await Order.findById(id);
+    const order = await Order.findById(id).populate([
+      {
+        path: "products.idProduct",
+        select: selectProduct,
+      },
+      { path: "idTable", select: selectTable },
+    ]);
 
     if (!order)
       return res.status(400).json({ message: "No se encontro ninguna orden" });
@@ -59,7 +80,7 @@ const deleteOrder = async (req, res) => {
 };
 
 const postOrder = async (req, res) => {
-  const { products, numMesa } = req.body;
+  const { products, idTable } = req.body;
 
   try {
     const foundProducts = await services.searchProducts(products);
@@ -68,7 +89,7 @@ const postOrder = async (req, res) => {
         .status(400)
         .json({ message: "No se pudieron encontrar todos los productos" });
 
-    const newOrder = new Order({ products, numMesa });
+    const newOrder = new Order({ products, idTable });
     let savedOrder = await newOrder.save();
 
     const newSale = new Sale({ order: savedOrder._id });

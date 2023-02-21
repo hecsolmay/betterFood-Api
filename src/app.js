@@ -23,9 +23,7 @@ app.use(cors());
 app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
-  res.json({
-    message: `Para encontrar nuestra documentacion dirigite a ${apiURL}/api/docs`,
-  });
+  res.redirect(`${apiURL}/docs`);
 });
 
 swaggerSetup(app);

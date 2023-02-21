@@ -1,13 +1,20 @@
 const Product = require("../models/Product");
 
 const searchProducts = async (products) => {
-  const foundProducts = products
-    ? await Product.find({
-        _id: { $in: products.map((p) => p.idProduct) },
-      })
-    : null;
+  let foundProducts = null;
 
-  if (foundProducts.length != products.length) return null;
+  if (products.length !== 0) {
+    const uniqueArray = products.filter((item, index, self) => {
+      return index === self.findIndex((p) => p.idProduct === item.idProduct);
+    });
+    console.log(uniqueArray);
+    foundProducts = await Product.find({
+      _id: { $in: uniqueArray.map((p) => p.idProduct) },
+    });
+
+    if (uniqueArray.length !== foundProducts.length) return null;
+  }
+
   return foundProducts;
 };
 

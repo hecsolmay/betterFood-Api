@@ -11,7 +11,6 @@ const getIngredents = async (req, res) => {
   try {
     let { limit, page } = paginate.getQuery(req);
     const query = getQueryParams(req);
-    // const sort = getQuerySort(req);
 
     const ingredents = await Ingredent.paginate(
       query,
@@ -106,9 +105,12 @@ const updateIngredent = async (req, res) => {
 
 function getQueryParams(req) {
   let query = {};
-  const { q } = req.query;
+  const { q, active } = req.query;
 
   if (q) query.name = { $regex: q, $options: "i" };
+  if (active) {
+    if (active == 1) query.active = 1;
+  }
 
   return query;
 }

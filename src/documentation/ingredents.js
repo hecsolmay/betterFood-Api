@@ -12,6 +12,12 @@
  *        schema:
  *          type: string
  *      - in: query
+ *        name: active
+ *        required: false
+ *        description: filtro por activos 1 son los activos 
+ *        schema:
+ *          type: number
+ *      - in: query
  *        name: limit
  *        required: false
  *        schema:

@@ -1,7 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const { createRoles } = require("./libs/initialSetup");
+const { createRoles, createAdmin } = require("./libs/initialSetup");
 const { swaggerSetup } = require("./swagger");
 const { apiURL } = require("./config/config");
 
@@ -16,6 +16,7 @@ const {
 
 const app = express();
 createRoles();
+createAdmin();
 
 app.use(express.json());
 app.use(cors());

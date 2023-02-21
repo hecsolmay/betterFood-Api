@@ -3,6 +3,16 @@ const morgan = require("morgan");
 const cors = require("cors");
 const { createRoles } = require("./libs/initialSetup");
 const { swaggerSetup } = require("./swagger");
+const { apiURL } = require("./config/config");
+
+const {
+  adminRouter: CategoryAdmin,
+  mobileRouter: CategoryMobile,
+} = require("./routes/categories.routes");
+const {
+  adminRouter: ProductAdmin,
+  mobileRouter: ProductMobile,
+} = require("./routes/products.routes");
 
 const app = express();
 createRoles();
@@ -13,18 +23,26 @@ app.use(cors());
 app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
-  res.send("Por favor accede a https://betterfood-api.up.railway.app/api/docs para ver la documentacion");
+  res.json({
+    message: `Para encontrar nuestra documentacion dirigite a ${apiURL}/api/docs`,
+  });
 });
 
 swaggerSetup(app);
-app.use("/auth", require("./routes/auth.routes"));
-app.use("/category", require("./routes/categories.routes"));
-app.use("/dashboard", require("./routes/dashboard.routes"));
-app.use("/ingredent", require("./routes/ingredents.routes"));
-app.use("/order", require("./routes/orders.routes"));
-app.use("/product", require("./routes/products.routes"));
-app.use("/sale", require("./routes/sales.routes"));
-app.use("/user", require("./routes/user.routes"));
-app.use("/waiter", require("./routes/waiter.routes"));
+app.use("/api/auth", require("./routes/auth.routes"));
+app.use("/api/category", CategoryAdmin);
+app.use("/api/m/category", CategoryMobile);
+app.use("/api/dashboard", require("./routes/dashboard.routes"));
+app.use("/api/ingredent", require("./routes/ingredents.routes")); // Aligerar los datos
+app.use("/api/order", require("./routes/orders.routes"));
+app.use("/api/product", ProductAdmin);
+app.use("/api/m/product", ProductMobile);
+app.use("/api/sale", require("./routes/sales.routes")); // Aligerar los datos
+app.use("/api/table", require("./routes/table.routes"));
+app.use("/api/user", require("./routes/user.routes"));
+app.use("/api/waiter", require("./routes/waiter.routes")); // Aligererar los datos
+app.use("*", (req, res) => {
+  res.status(404).json({ message: "Nothing Found Here" });
+});
 
 module.exports = app;

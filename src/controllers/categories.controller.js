@@ -31,6 +31,32 @@ const getCategories = async (req, res) => {
   }
 };
 
+const getCategoriesMobile = async (req, res) => {
+  try {
+    let { limit, page } = paginate.getQuery(req);
+    let query = getQueryParams(req);
+    query = { ...query, active: 1 };
+    const sort = { name: 1 };
+    const selectDTO = { _id: 1, name: 1, imgURL: 1 };
+
+    let Categories = await Category.paginate(
+      query,
+      paginate.getOptions({ limit, page, sort, select: selectDTO })
+    );
+
+    const info = paginate.info(Categories, path);
+
+    if (page > info.totalPages)
+      return res.status(404).json({ error: "there is nothing here" });
+
+    const { results } = Categories;
+    paginate.success(res, 200, "ok", info, results);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
 const getCategory = async (req, res) => {
   const { id } = req.params;
   try {
@@ -66,7 +92,7 @@ const deleteCategory = async (req, res) => {
     if (!deletedCategory)
       return Response.error(res, createHttpError.NotFound());
 
-    Response.succes(res, 200, `Categoria ${id} eliminada`, deletedCategory);
+    return res.status(204).json({ message: "No Content" });
   } catch (error) {
     Response.error(res);
   }
@@ -106,6 +132,10 @@ function getQuerySort(req) {
 
   if (sort) query.totalProducts = sort == -1 ? sort : 1;
 
+  if (Object.entries(query).length === 0) {
+    query.name = 1;
+  }
+
   return query;
 }
 
@@ -115,4 +145,5 @@ module.exports = {
   createCategory,
   deleteCategory,
   updateCategory,
+  getCategoriesMobile,
 };

@@ -4,7 +4,6 @@ const createHttpError = require("http-errors");
 const paginate = require("../common/paginate");
 const { apiURL } = require("../config/config");
 const PascalCase = require("../libs/pascalCase");
-const Category = require("../models/Category");
 
 const path = `${apiURL}/product`;
 
@@ -24,7 +23,7 @@ const populateOptions = [
 const getProducts = async (req, res) => {
   try {
     let { limit, page } = paginate.getQuery(req);
-    const query = await getQueryParams(req);
+    const query = getQueryParams(req);
     const sort = getQuerySort(req);
 
     const products = await Product.paginate(
@@ -34,6 +33,135 @@ const getProducts = async (req, res) => {
         page,
         populate: populateOptions,
         sort: sort,
+      })
+    );
+    const info = paginate.info(products, path);
+
+    if (page > info.totalPages)
+      return res.status(404).json({ error: "there is nothing here" });
+
+    const { results } = products;
+    paginate.success(res, 200, "ok", info, results);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
+const getCategoryProducts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let { limit, page } = paginate.getQuery(req);
+    const selectDTO = {
+      name: 1,
+      imgURL: 1,
+      price: 1,
+      description: 1,
+      _id: 1,
+      ofert: 1,
+      ofertPrice: 1,
+    };
+    const sort = { name: 1 };
+    const query = { active: 1, categories: id };
+
+    const products = await Product.paginate(
+      query,
+      paginate.getOptions({
+        limit,
+        page,
+        sort,
+        select: selectDTO,
+      })
+    );
+    const info = paginate.info(products, path);
+
+    if (page > info.totalPages)
+      return res.status(404).json({ error: "there is nothing here" });
+
+    const { results } = products;
+    paginate.success(res, 200, "ok", info, results);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+const getProductsDTO = async (req, res) => {
+  try {
+    let query = getQueryParams(req);
+    let { limit, page } = paginate.getQuery(req);
+    const selectDTO = {
+      name: 1,
+      imgURL: 1,
+      price: 1,
+      description: 1,
+      _id: 1,
+      ofert: 1,
+      ofertPrice: 1,
+    };
+    const sort = { name: 1 };
+    query = { ...query, active: 1 };
+
+    const products = await Product.paginate(
+      query,
+      paginate.getOptions({
+        limit,
+        page,
+        sort,
+        select: selectDTO,
+      })
+    );
+    const info = paginate.info(products, path);
+
+    if (page > info.totalPages)
+      return res.status(404).json({ error: "there is nothing here" });
+
+    const { results } = products;
+    paginate.success(res, 200, "ok", info, results);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
+const getProductDTO = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id)
+      .populate(populateOptions)
+      .select({ ordered: 0, active: 0, createdAt: 0, updatedAt: 0 });
+
+    if (!product) return Response.error(res, createHttpError.NotFound());
+
+    Response.succes(res, 200, `Producto ${id}`, product);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
+const getProductsOfert = async (req, res) => {
+  try {
+    let query = getQueryParams(req);
+    let { limit, page } = paginate.getQuery(req);
+    const selectDTO = {
+      name: 1,
+      imgURL: 1,
+      price: 1,
+      description: 1,
+      _id: 1,
+      ofert: 1,
+      ofertPrice: 1,
+    };
+    const sort = { name: 1 };
+    query = { active: 1, ofert: { $gt: 0 } };
+
+    const products = await Product.paginate(
+      query,
+      paginate.getOptions({
+        limit,
+        page,
+        sort,
+        select: selectDTO,
       })
     );
     const info = paginate.info(products, path);
@@ -96,7 +224,7 @@ const deleteProduct = async (req, res) => {
         .status(400)
         .json({ message: "No se pudo encontrar el producto" });
 
-    Response.succes(res, 200, `Producto ${id} eliminado `, deletedProduct);
+    return res.status(204).json();
   } catch (error) {
     console.error(error);
     Response.error(res);
@@ -108,6 +236,9 @@ const updateProduct = async (req, res) => {
     req.body;
   try {
     const { id } = req.params;
+    let { ofert } = req.body;
+
+    if (ofert < 0 || ofert > 100) ofert = 0;
 
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
@@ -120,6 +251,7 @@ const updateProduct = async (req, res) => {
           categories,
           ingredents,
           active,
+          ofert,
         },
       },
       { new: true }
@@ -130,30 +262,15 @@ const updateProduct = async (req, res) => {
         .status(400)
         .json({ message: "No se pudo encontrar el producto" });
 
-    Response.succes(
-      res,
-      200,
-      `Producto ${updatedProduct.name} actualizado `,
-      updatedProduct
-    );
+    return res.status(204);
   } catch (error) {
     Response.error(res);
   }
 };
 
-async function getQueryParams(req) {
+function getQueryParams(req) {
   let query = {};
-  const { category, q, offert } = req.query;
-
-  if (category) {
-    let foundCategory = await Category.findOne({
-      name: { $regex: category, $options: "i" },
-    });
-
-    if(foundCategory)
-    query.categories = foundCategory._id
-  }
-  if (offert) query.offert = { $gt: 0 };
+  const { q } = req.query;
 
   if (q) query.name = { $regex: q, $options: "i" };
 
@@ -168,7 +285,7 @@ function getQuerySort(req) {
   if (ordered) query.ordered = ordered;
   if (price) query.price = price;
 
-  console.log(query);
+  if (Object.entries(query).length === 0) query.name = 1;
   return query;
 }
 module.exports = {
@@ -177,4 +294,8 @@ module.exports = {
   createProduct,
   deleteProduct,
   updateProduct,
+  getCategoryProducts,
+  getProductsOfert,
+  getProductsDTO,
+  getProductDTO,
 };

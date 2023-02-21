@@ -16,7 +16,12 @@ const getUsers = async (req, res) => {
 
     const users = await User.paginate(
       query,
-      paginate.getOptions({ limit, page, populate: "rol", select: "-password" })
+      paginate.getOptions({
+        limit,
+        page,
+        populate: "rol",
+        select: "-password -picture",
+      })
     );
 
     const info = paginate.info(users, path);

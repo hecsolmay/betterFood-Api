@@ -31,6 +31,7 @@ const getIngredents = async (req, res) => {
     paginate.success(res, 200, "ok", info, results);
   } catch (error) {
     console.error(error);
+    Response.error(res);
   }
 };
 
@@ -68,7 +69,7 @@ const deleteIngredent = async (req, res) => {
     if (!deletedIngredent)
       return Response.error(res, createHttpError.NotFound());
 
-    Response.succes(res, 200, `Ingrediente ${id} eliminada`, deletedIngredent);
+    return res.status(204).json({ message: "No Content" });
   } catch (error) {
     console.error(error);
     Response.error(res);

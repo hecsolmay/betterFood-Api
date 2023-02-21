@@ -74,7 +74,7 @@ const deleteWaiter = async (req, res) => {
 
     if (!deletedWaiter) return Response.error(res, createHttpError.NotFound());
 
-    Response.succes(res, 200, `Mesero ${id} eliminado`, deletedWaiter);
+    return res.status(204).json();
   } catch (error) {
     console.error(error);
     Response.error(res);

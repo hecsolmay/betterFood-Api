@@ -5,6 +5,7 @@ const PascalCase = require("../libs/pascalCase");
 
 const singUp = async (req, res) => {
   try {
+    const expires = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
     let { username, email, password, rol } = req.body;
     const externalToken = req.get("Authorization")?.split(" ").pop();
     let picture = "";
@@ -28,11 +29,11 @@ const singUp = async (req, res) => {
       picture,
     });
 
-    const token = jwtoken.tokenSign(savedUser, rol);
+    const token = jwtoken.tokenSign(savedUser, rol, expires);
 
     const user = UserServices.cleanUser(savedUser);
 
-    res.status(200).json({ token, user });
+    res.status(200).json({ token, user, expiresAt: expires });
   } catch (error) {
     return Response.error(res);
   }
@@ -40,6 +41,7 @@ const singUp = async (req, res) => {
 
 const signIn = async (req, res) => {
   try {
+    const expires = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
     let { email, password } = req.body;
     const externalToken = req.get("Authorization")?.split(" ").pop();
 
@@ -62,13 +64,13 @@ const signIn = async (req, res) => {
         .json({ token: null, message: "invalid password or User" });
 
     console.log(userFound.rol.name);
-    const token = jwtoken.tokenSign(userFound, userFound.rol.name);
+    const token = jwtoken.tokenSign(userFound, userFound.rol.name, expires);
 
     const user = UserServices.cleanUser(userFound);
 
     console.log(user);
 
-    res.json({ token, user });
+    res.json({ token, user, expiresAt: expires });
   } catch (error) {
     Response.error(res);
   }

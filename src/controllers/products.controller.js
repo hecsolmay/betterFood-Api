@@ -232,11 +232,14 @@ const deleteProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const { name, imgURL, price, description, categories, ingredents, active } =
+  const { imgURL, price, description, categories, ingredents, active } =
     req.body;
   try {
     const { id } = req.params;
     let { ofert } = req.body;
+    let { name } = req.body;
+
+    if (name) name = PascalCase(name);
 
     if (ofert < 0 || ofert > 100) ofert = 0;
 
@@ -244,7 +247,7 @@ const updateProduct = async (req, res) => {
       id,
       {
         $set: {
-          name: PascalCase(name),
+          name,
           imgURL,
           price,
           description,

@@ -53,7 +53,7 @@ const getQuery = (req) => {
 
 const getOptions = ({ limit, page, select = "", populate = "", sort = {} }) => {
   return {
-    select: "-password",
+    select: select,
     populate: populate,
     sort: sort,
     limit: limit,

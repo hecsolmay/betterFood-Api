@@ -2,7 +2,6 @@ const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerUI = require("swagger-ui-express");
 const path = require("path");
 
-// const allRoutes = path.join(__dirname, "routes/*.js");
 const allRoutes = path.join(__dirname, "documentation/*.js");
 const allSchemas = path.join(__dirname, "models/*.js");
 
@@ -16,8 +15,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
-        // url: "https://betterfood-api.up.railway.app",
+        // url: "http://localhost:3000",
+        url: "https://betterfood-api.up.railway.app",
       },
     ],
     components: {

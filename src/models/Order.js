@@ -10,34 +10,34 @@ const Sale = require("./Sale");
  *     Order:
  *       type: object
  *       properties:
- *        products: 
+ *        products:
  *          type: array
- *          items: 
+ *          items:
  *            type: object
  *            properties:
- *              idProduct: 
- *                type: string 
+ *              idProduct:
+ *                type: string
  *              quantity:
- *                type: number 
- *        numMesa: 
+ *                type: number
+ *        numMesa:
  *          type: number
  *       required:
- *        - products 
- *        - numMesa 
- * 
+ *        - products
+ *        - numMesa
+ *
  *     OrderResponse:
  *       type: object
  *       properties:
  *        id:
  *          type: string
- *        products: 
+ *        products:
  *          type: array
  *          properties:
- *            idProduct: 
- *              type: string 
+ *            idProduct:
+ *              type: string
  *            quantity:
- *              type: number 
- *        numMesa: 
+ *              type: number
+ *        numMesa:
  *          type: number
  *        totalQuantity:
  *          type: number
@@ -47,9 +47,8 @@ const Sale = require("./Sale");
  *          type: string
  *        updatedAt:
  *          type: string
- *   
+ *
  */
-
 
 const orderSchema = new Schema(
   {
@@ -79,7 +78,14 @@ orderSchema.pre("save", async function () {
     let productId = this.products[i].idProduct;
     let cantidad = this.products[i].quantity;
     const product = await Product.getProductById(productId);
-    total += product.price * cantidad;
+    let price = product.price;
+
+    if (product.ofert !== 0) {
+      let discount = (price * product.ofert) / 100;
+      price = price - discount.toFixed(2);
+    }
+
+    total += price * cantidad;
     totalQuantity += cantidad;
 
     await Product.findByIdAndUpdate(productId, {
@@ -108,12 +114,14 @@ orderSchema.pre("findOneAndDelete", async function () {
 orderSchema.set("toJSON", {
   transform: function (doc, ret) {
     ret.id = doc._id;
-    ret.products = doc.products.map((p) => {
-      return {
-        idProduct: p.idProduct,
-        quantity: p.quantity,
-      };
-    });
+    if (ret.products.length !== 0) {
+      ret.products = doc.products.map((p) => {
+        return {
+          idProduct: p.idProduct,
+          quantity: p.quantity,
+        };
+      });
+    }
     delete ret._id;
   },
 });

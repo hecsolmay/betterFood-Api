@@ -55,6 +55,24 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *          active: 1,
  *          id: 63e51bccc8f638d26725715c
  *   
+ *     CategoryResponseDTO:
+ *       type: object
+ *       properties:
+ *        id: 
+ *          type: string
+ *          description: id de la categoria
+ *        name: 
+ *          type: string
+ *          description: nombre de la categoria
+ *        imgURL:
+ *          type: string
+ *          format: url
+ *          description: La imagen de la categoria por medio de url
+ *       example: 
+ *          id: 63e51bccc8f638d26725715c
+ *          name: Tacos
+ *          imgURL: https://cdn.pixabay.com/photo/2019/07/21/01/36/tacos-al-pastor-4351813_1280.jpg
+ *   
  *     CategoryUpdate:
  *       type: object
  *       properties:

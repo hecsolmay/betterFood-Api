@@ -46,6 +46,7 @@ const saleSchema = new Schema(
   {
     order: { ref: "Order", type: Schema.Types.ObjectId },
     paid: { type: Boolean, default: false },
+    waiter: {type: Schema.Types.ObjectId, ref: "Waiter"},
     moneyReceived: { type: Number, default: 0 },
   },
   { timestamps: true, versionKey: false }
@@ -53,7 +54,6 @@ const saleSchema = new Schema(
 
 saleSchema.virtual("change").get(function () {
   let total = this.order ? this.order.total : 0;
-  console.log(this.order);
   if (this.moneyReceived >= total) {
     return this.moneyReceived - total;
   }
@@ -63,12 +63,17 @@ saleSchema.virtual("change").get(function () {
 
 saleSchema.plugin(mongoosePaginate);
 
+saleSchema.set("toObject", { getters: true, virtuals: true });
+
+
 saleSchema.set("toJSON", {
   transform: function (doc, ret) {
     ret.id = doc._id;
+
     delete ret._id;
   },
   virtuals: true,
+  getters: true
 });
 
 module.exports = model("Sale", saleSchema);

@@ -9,11 +9,9 @@ const {
 
 const router = Router();
 
-
-
-
 router
   .get("/", ingredentsCtrl.getIngredents)
+  .get("/all", ingredentsCtrl.getAll)
   .get("/:id", ingredentsCtrl.getIngredent)
   .post(
     "/",

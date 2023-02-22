@@ -7,6 +7,16 @@ const PascalCase = require("../libs/pascalCase");
 
 const path = `${apiURL}/category`;
 
+const getAllCategories = async (req, res) => {
+  try {
+    const allCategoriess = await Category.find({ active: 1 });
+    return Response.succes(res, 200, "All Categoriess", allCategoriess);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
 const getCategories = async (req, res) => {
   try {
     let { limit, page } = paginate.getQuery(req);
@@ -140,6 +150,7 @@ function getQuerySort(req) {
 }
 
 module.exports = {
+  getAllCategories,
   getCategories,
   getCategory,
   createCategory,

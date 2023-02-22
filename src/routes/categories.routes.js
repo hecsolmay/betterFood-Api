@@ -13,6 +13,7 @@ const mobileRouter = Router();
 
 // WEB ADMIN  ---------------------------------
 adminRouter.get("/", categoryCtrl.getCategories);
+adminRouter.get("/all", categoryCtrl.getAllCategories);
 
 adminRouter.get("/:id", categoryCtrl.getCategory);
 

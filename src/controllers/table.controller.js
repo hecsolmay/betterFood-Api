@@ -9,12 +9,14 @@ const getTables = async (req, res) => {
   let { limit, page } = paginate.getQuery(req);
   // const query = getQueryParams(req);
   // const sort = getQuerySort(req);
+  const sort = { numMesa: 1 };
 
   const tables = await Table.paginate(
     {},
     paginate.getOptions({
       limit,
       page,
+      sort,
     })
   );
 

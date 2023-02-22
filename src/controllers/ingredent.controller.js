@@ -7,6 +7,16 @@ const PascalCase = require("../libs/pascalCase");
 
 const path = `${apiURL}/ingredent`;
 
+const getAll = async (req, res) => {
+  try {
+    const allIngredents = await Ingredent.find({ active: 1 });
+    return Response.succes(res, 200, "All ingredents", allIngredents);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
 const getIngredents = async (req, res) => {
   try {
     let { limit, page } = paginate.getQuery(req);
@@ -116,6 +126,7 @@ function getQueryParams(req) {
 }
 
 module.exports = {
+  getAll,
   getIngredents,
   getIngredent,
   createIngredent,

@@ -42,7 +42,8 @@
  * /api/waiter/{id}:
  *  get:
  *    summary: Retorna un mesero por id
- *    tags: [Waiter]
+ *    tags: 
+ *      - Waiter
  *    parameters:
  *      - in: path
  *        name: id
@@ -57,7 +58,35 @@
  *          application/json:
  *            schema:
  *              type: object
- *              $ref: '#/components/schemas/CategoryResponse'
+ *              $ref: '#/components/schemas/WaiterResponse'
+ *      404:
+ *        description: Not Found
+ * 
+ */
+
+
+/**
+ * @swagger
+ * /api/m/waiter/{id}:
+ *  get:
+ *    summary: Retorna un mesero por id
+ *    tags: 
+ *      - Mobile
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: the Waiter Id
+ *    responses:
+ *      200:
+ *        description: Success
+ *        content: 
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              $ref: '#/components/schemas/WaiterResponseDto'
  *      404:
  *        description: Not Found
  * 

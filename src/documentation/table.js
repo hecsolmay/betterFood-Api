@@ -35,7 +35,8 @@
  * /api/table/{id}:
  *  get:
  *    summary: Retorna una mesa por id
- *    tags: [Tables]
+ *    tags: 
+ *      - Tables
  *    parameters:
  *      - in: path
  *        name: id
@@ -50,7 +51,34 @@
  *          application/json:
  *            schema:
  *              type: object
- *              $ref: '#/components/schemas/CategoryResponse'
+ *              $ref: '#/components/schemas/TableResponse'
+ *      404:
+ *        description: Not Found
+ *
+ */
+
+/**
+ * @swagger
+ * /api/m/table/{id}:
+ *  get:
+ *    summary: Retorna una mesa por id
+ *    tags: 
+ *      - Mobile
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: the Table Id
+ *    responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              $ref: '#/components/schemas/TableResponseDto'
  *      404:
  *        description: Not Found
  *

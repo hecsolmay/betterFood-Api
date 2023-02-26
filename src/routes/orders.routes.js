@@ -6,6 +6,7 @@ const {
   verifyStatusDeleteOrder,
   canSale,
   existedTable,
+  verifyWaiter,
 } = require("../middleware");
 
 const router = Router();
@@ -13,7 +14,7 @@ const router = Router();
 router
   .get("/", [verifyToken, canSale], orderController.getOrders)
   .get("/:id", [verifyToken, canSale], orderController.getOrder)
-  .post("/", [existedTable], orderController.postOrder)
+  .post("/", [existedTable, verifyWaiter], orderController.postOrder)
   .delete(
     "/:id",
     [verifyToken, canEdit, verifyStatusDeleteOrder],

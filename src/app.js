@@ -13,6 +13,15 @@ const {
   adminRouter: ProductAdmin,
   mobileRouter: ProductMobile,
 } = require("./routes/products.routes");
+const {
+  adminRouter: WaiterAdmin,
+  mobileRouter: WaiterMobile,
+} = require("./routes/waiter.routes");
+
+const {
+  AdminRoute: tableAdmin,
+  MobileRoute: tableMobile,
+} = require("./routes/table.routes");
 
 const app = express();
 createRoles();
@@ -32,14 +41,16 @@ app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/category", CategoryAdmin);
 app.use("/api/m/category", CategoryMobile);
 app.use("/api/dashboard", require("./routes/dashboard.routes"));
-app.use("/api/ingredent", require("./routes/ingredents.routes")); // Aligerar los datos
+app.use("/api/ingredent", require("./routes/ingredents.routes"));
 app.use("/api/order", require("./routes/orders.routes"));
 app.use("/api/product", ProductAdmin);
 app.use("/api/m/product", ProductMobile);
-app.use("/api/sale", require("./routes/sales.routes")); // Aligerar los datos
-app.use("/api/table", require("./routes/table.routes"));
+app.use("/api/sale", require("./routes/sales.routes"));
+app.use("/api/table", tableAdmin);
+app.use("/api/m/table", tableMobile);
 app.use("/api/user", require("./routes/user.routes"));
-app.use("/api/waiter", require("./routes/waiter.routes")); // Aligererar los datos
+app.use("/api/waiter", WaiterAdmin);
+app.use("/api/m/waiter", WaiterMobile);
 app.use("*", (req, res) => {
   res.status(404).json({ message: "Nothing Found Here" });
 });

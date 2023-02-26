@@ -20,6 +20,8 @@
     "mongoose": "^6.8.3",
     "mongoose-paginate-v2": "^1.7.1",
     "morgan": "^1.10.0",
+    "pdfkit": "^0.13.0",
+    "qrcode": "^1.5.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.0"
   },

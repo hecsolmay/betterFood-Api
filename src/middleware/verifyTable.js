@@ -3,6 +3,12 @@ const Waiter = require("../models/Waiter");
 
 const uniqueTable = async (req, res, next) => {
   const { numMesa } = req.body;
+  const { id } = req.params;
+
+  if (id) {
+    const foundTable = await Table.findById(id);
+    if (foundTable.numMesa == numMesa) return next();
+  }
 
   if (numMesa) {
     const foundTable = await Table.findOne({ numMesa });

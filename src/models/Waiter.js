@@ -8,28 +8,28 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *     Waiter:
  *       type: object
  *       properties:
- *        name: 
+ *        name:
  *          type: string
  *        lastName:
  *          type: string
  *        birthdate:
  *          type: string
  *       required:
- *        - name 
- *        - lastName 
- *        - birthdate 
- *       example: 
+ *        - name
+ *        - lastName
+ *        - birthdate
+ *       example:
  *        name: hecTOR
  *        lastName: Solis
  *        birthdate: 01/30/2003
- * 
+ *
  *     WaiterResponse:
  *       type: object
  *       properties:
- *        id: 
+ *        id:
  *          type: string
  *          description: id de la categoria
- *        name: 
+ *        name:
  *          type: string
  *        lastName:
  *          type: string
@@ -43,8 +43,8 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *          type: string
  *        updateAt:
  *          type: string
- *       
- *       example: 
+ *
+ *       example:
  *          name: Hector
  *          lastName: Solis
  *          birthdate: 2003-01-30T06:00:00.000Z
@@ -53,11 +53,27 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *          createdAt: 2023-02-09T16:14:05.541Z,
  *          updatedAt: 2023-02-16T06:47:31.559Z,
  *          id: 63e51bccc8f638d26725715c
- *   
+ *
+ *     WaiterResponseDto:
+ *       type: object
+ *       properties:
+ *        id:
+ *          type: string
+ *          description: id de la categoria
+ *        name:
+ *          type: string
+ *        lastName:
+ *          type: string
+ *
+ *       example:
+ *          name: Hector
+ *          lastName: Solis
+ *          id: 63e51bccc8f638d26725715c
+ *
  *     WaiterUpdate:
  *       type: object
  *       properties:
- *        name: 
+ *        name:
  *          type: string
  *        lastName:
  *          type: string
@@ -65,14 +81,12 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *          type: string
  *        active:
  *          type: number
- *       example: 
+ *       example:
  *          name: Hector
  *          lastName: Solis
  *          birthdate: 01/30/2003
  *          active: 1,
  */
-
-
 
 const WaiterSchema = new Schema(
   {
@@ -90,10 +104,12 @@ const WaiterSchema = new Schema(
 WaiterSchema.plugin(mongoosePaginate);
 
 WaiterSchema.virtual("age").get(function () {
-  const now = new Date();
-  const diff = now - this.birthdate;
-  const age = Math.floor(diff / (365 * 24 * 60 * 60 * 1000));
-  return age;
+  if (this.birthdate) {
+    const now = new Date();
+    const diff = now - this.birthdate;
+    const age = Math.floor(diff / (365 * 24 * 60 * 60 * 1000));
+    return age;
+  }
 });
 
 WaiterSchema.set("toJSON", {

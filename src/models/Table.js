@@ -28,8 +28,6 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *          type: number
  *        capacity:
  *          type: number
- *        waiterId:
- *          type: string
  *        active:
  *          type: number
  *        createdAt:
@@ -40,10 +38,23 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *          id: 63e51bccc8f638d26725715c
  *          numMesa: 1
  *          capacity: 6
- *          waiterId: 63e51bccc8f638d26725720P
  *          active: 1,
  *          createdAt: 2023-02-09T16:14:05.541Z,
  *          updatedAt: 2023-02-16T06:47:31.559Z,
+ *
+ *     TableResponseDto:
+ *       type: object
+ *       properties:
+ *        id:
+ *          type: string
+ *        numMesa:
+ *          type: number
+ *        capacity:
+ *          type: number
+ *       example:
+ *          id: 63e51bccc8f638d26725715c
+ *          numMesa: 1
+ *          capacity: 6
  *
  *     TableUpdate:
  *       type: object
@@ -52,14 +63,11 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *          type: number
  *        capacity:
  *          type: number
- *        waiterId:
- *          type: string
  *        active:
  *          type: number
  *       example:
  *          numMesa: 2
  *          capacity: 6
- *          waiterId: 63e51bccc8f638d26725715c
  *          active: 1,
  */
 
@@ -67,7 +75,6 @@ const tableSchema = new Schema(
   {
     numMesa: { type: Number, required: true },
     capacity: { type: Number, required: true },
-    waiterId: { type: Schema.Types.ObjectId, ref: "Waiter" },
     active: { type: Number, default: 1 },
   },
   { timestamps: true, versionKey: false }

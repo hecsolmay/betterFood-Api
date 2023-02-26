@@ -34,7 +34,9 @@ const Ingredent = require("./Ingredent");
  *                items:
  *                  id:
  *                    type: string
- *        idTable:
+ *        waiterId:
+ *          type: string
+ *        tableId:
  *          type: string
  *       required:
  *        - products
@@ -52,7 +54,7 @@ const Ingredent = require("./Ingredent");
  *                type: string
  *              quantity:
  *                type: number
- *        idTable:
+ *        tableId:
  *          type: number
  *
  *     OrderDetailResponse:
@@ -114,7 +116,8 @@ const orderSchema = new Schema(
       },
     ],
     totalQuantity: { type: Number },
-    idTable: { ref: "Table", type: Schema.Types.ObjectId },
+    waiterId: { ref: "Waiter", type: Schema.Types.ObjectId },
+    tableId: { ref: "Table", type: Schema.Types.ObjectId },
     total: { type: Number, default: 0 },
   },
   { timestamps: true, versionKey: false }

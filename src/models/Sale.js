@@ -46,7 +46,6 @@ const saleSchema = new Schema(
   {
     order: { ref: "Order", type: Schema.Types.ObjectId },
     paid: { type: Boolean, default: false },
-    waiter: {type: Schema.Types.ObjectId, ref: "Waiter"},
     moneyReceived: { type: Number, default: 0 },
   },
   { timestamps: true, versionKey: false }

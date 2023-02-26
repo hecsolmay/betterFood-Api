@@ -6,9 +6,9 @@
  *    tags: [Order]
  *    parameters:
  *      - in: query
- *        name: q
+ *        name: date
  *        required: false
- *        description: filtro por  numero de mesa
+ *        description: filtro por  dia en que se hizo la orden dd/mm/yyyy
  *        schema:
  *          type: number
  *      - in: query

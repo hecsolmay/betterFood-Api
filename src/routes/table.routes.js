@@ -9,16 +9,18 @@ const {
 } = require("../middleware");
 
 const router = Router();
+const routerMobile = Router();
 
 router
   .get("/", tableCtrl.getTables)
+  .get("/qr", tableCtrl.getTablesQr)
+  .get("/all/qr", tableCtrl.getAllQr)
   .get("/:id", tableCtrl.getTable)
+  .get("/:id/qr", tableCtrl.getTableQrId)
   .post("/", [verifyToken, canEdit, uniqueTable], tableCtrl.createTable)
-  .put(
-    "/:id",
-    [verifyToken, canEdit, uniqueTable, verifyWaiter],
-    tableCtrl.updateTable
-  )
+  .put("/:id", [verifyToken, canEdit, uniqueTable], tableCtrl.updateTable)
   .delete("/:id", [verifyToken, isAdmin], tableCtrl.deleteTable);
 
-module.exports = router;
+routerMobile.get("/:id", tableCtrl.getTableDto);
+
+module.exports = { AdminRoute: router, MobileRoute: routerMobile };

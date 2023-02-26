@@ -4,6 +4,8 @@ const paginate = require("../common/paginate");
 const { apiURL } = require("../config/config");
 const createHttpError = require("http-errors");
 const PascalCase = require("../libs/pascalCase");
+const { generateListQr, generateQr } = require("../libs/qrcode");
+const PDFDocument = require("pdfkit");
 
 const path = `${apiURL}/waiter`;
 
@@ -38,6 +40,19 @@ const getWaiter = async (req, res) => {
   try {
     const { id } = req.params;
     const waiter = await Waiter.findById(id);
+    if (!waiter) Response.error(res, createHttpError.NotFound());
+
+    Response.succes(res, 200, `Mesero ${id}`, waiter);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
+const getWaiterDto = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const waiter = await Waiter.findById(id, { name: 1, lastName: 1 });
     if (!waiter) Response.error(res, createHttpError.NotFound());
 
     Response.succes(res, 200, `Mesero ${id}`, waiter);
@@ -105,6 +120,75 @@ const updateWaiter = async (req, res) => {
   }
 };
 
+const getWaitersQr = async (req, res) => {
+  try {
+    let { limit, page } = paginate.getQuery(req);
+    const query = getQueryParams(req);
+
+    const waiters = await Waiter.paginate(
+      query,
+      paginate.getOptions({
+        limit,
+        page,
+      })
+    );
+
+    const { results } = waiters;
+
+    let listWaiters = results.map((w) => {
+      let title = `Mesero ${w.name} ${w.lastName}`;
+      return {
+        title,
+        id: w._id,
+      };
+    });
+
+    generateListQr(res, listWaiters, "waitersqr");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error generando códigos QR" });
+  }
+};
+
+const getWaiterQrId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const waiter = await Waiter.findById(id);
+
+    if (!waiter) return res.status(404).json({ message: "Waiter not Found" });
+    let title = `Mesero ${waiter.name} ${waiter.lastName}`;
+
+    let qrWaiter = {
+      title,
+      id: waiter._id,
+    };
+
+    generateQr(res, qrWaiter, "qrcode");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error generando códigos QR" });
+  }
+};
+
+const getAllQr = async (req, res) => {
+  try {
+    const waiter = await Waiter.find({});
+
+    let listWaiters = waiter.map((w) => {
+      let title = `Mesero ${w.name} ${w.lastName}`;
+      return {
+        title,
+        id: w._id,
+      };
+    });
+
+    generateListQr(res, listWaiters, "waitersqr");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error generando códigos QR" });
+  }
+};
+
 function getQueryParams(req) {
   let query = {};
   const { q } = req.query;
@@ -120,4 +204,8 @@ module.exports = {
   createWaiter,
   deleteWaiter,
   updateWaiter,
+  getWaiterDto,
+  getWaitersQr,
+  getWaiterQrId,
+  getAllQr,
 };

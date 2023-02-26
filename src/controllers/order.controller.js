@@ -47,13 +47,22 @@ const getOrder = async (req, res) => {
       createdAt: 0,
       updatedAt: 0,
     };
+
+    const selectWaiter = {
+      birthdate: 0,
+      active: 0,
+      createdAt: 0,
+      updatedAt: 0,
+    };
+
     const { id } = req.params;
     const order = await Order.findById(id).populate([
       {
         path: "products.idProduct",
         select: selectProduct,
       },
-      { path: "idTable", select: selectTable },
+      { path: "tableId", select: selectTable },
+      { path: "waiterId", select: selectWaiter },
     ]);
 
     if (!order)
@@ -80,7 +89,7 @@ const deleteOrder = async (req, res) => {
 };
 
 const postOrder = async (req, res) => {
-  const { products, idTable } = req.body;
+  const { products, tableId, waiterId } = req.body;
 
   try {
     const foundProducts = await services.searchProducts(products);
@@ -89,7 +98,7 @@ const postOrder = async (req, res) => {
         .status(400)
         .json({ message: "No se pudieron encontrar todos los productos" });
 
-    const newOrder = new Order({ products, idTable });
+    const newOrder = new Order({ products, tableId, waiterId });
     let savedOrder = await newOrder.save();
 
     const newSale = new Sale({ order: savedOrder._id });
@@ -103,11 +112,12 @@ const postOrder = async (req, res) => {
 
 function getQueryParams(req) {
   let query = {};
-  const { q } = req.query;
+  const { date } = req.query;
 
-  // if (paid) query.paid = paid == 1;
-  if (q) query.numMesa = q;
-
+  if (date) {
+    let findDate = new Date(Date.parse(date.split("/").reverse().join("/")));
+    query.createdAt = { $gte: findDate };
+  }
   return query;
 }
 

@@ -94,7 +94,7 @@ async function getQueryParams(req) {
   let { q = "", email = "", rol = "" } = req.query;
   let query = {};
 
-  if (q && q.lenght > 3) {
+  if (q) {
     query.username = { $regex: q, $options: "i" };
   }
   if (email && email.lenght > 3) {

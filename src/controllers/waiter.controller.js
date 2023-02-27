@@ -135,7 +135,9 @@ const getWaitersQr = async (req, res) => {
 
     const { results } = waiters;
 
-    let listWaiters = results.map((w) => {
+    const filteredWaiters = results.filter((w) => w.active === 1);
+
+    let listWaiters = filteredWaiters.map((w) => {
       let title = `Mesero ${w.name} ${w.lastName}`;
       return {
         title,
@@ -174,7 +176,9 @@ const getAllQr = async (req, res) => {
   try {
     const waiter = await Waiter.find({});
 
-    let listWaiters = waiter.map((w) => {
+    const filteredWaiters = waiter.filter((w) => w.active === 1);
+
+    let listWaiters = filteredWaiters.map((w) => {
       let title = `Mesero ${w.name} ${w.lastName}`;
       return {
         title,

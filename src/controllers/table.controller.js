@@ -124,7 +124,9 @@ const getTablesQr = async (req, res) => {
 
     const { results } = tables;
 
-    let listTables = results.map((t) => {
+    const filteredTables = results.filter((t) => t.active === 1);
+
+    let listTables = filteredTables.map((t) => {
       let title = `Mesa ${t.numMesa}`;
       return {
         title,
@@ -163,7 +165,10 @@ const getAllQr = async (req, res) => {
   try {
     const tables = await Table.find({}).sort({ numMesa: 1 });
 
-    let listTables = tables.map((t) => {
+    const filteredTables = tables.filter((t) => t.active === 1);
+
+
+    let listTables = filteredTables.map((t) => {
       let title = `Mesa ${t.numMesa}`;
       return {
         title,

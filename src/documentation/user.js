@@ -1,6 +1,24 @@
 
 /**
  * @swagger
+ * /api/role:
+ *  get:
+ *    summary: Retorna todos los roles
+ *    tags: [Roles]
+ *    responses:
+ *      200:
+ *        description: Success
+ *        content: 
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/RoleResponse'
+ * 
+ */
+
+/**
+ * @swagger
  * /api/user/:
  *  get:
  *    summary: Retorna todos los usuarios

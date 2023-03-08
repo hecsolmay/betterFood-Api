@@ -62,7 +62,6 @@ const canSale = async (req, res, next) => {
   const { user } = req;
 
   const rol = user.rol.name;
-  console.log(rol);
   const canSale = rol === "admin" || rol === "moderator" || rol === "employee";
 
   if (!canSale)

@@ -18,7 +18,7 @@ const verifyExistingIngredents = async (req, res, next) => {
   const { ingredents } = req.body;
 
   if (ingredents) {
-    let id = ingredents.map(i => i.id) 
+    let id = ingredents.map((i) => i.id);
     const foundIngredents = await Ingredent.find({ _id: { $in: id } });
 
     if (foundIngredents.length !== ingredents.length)

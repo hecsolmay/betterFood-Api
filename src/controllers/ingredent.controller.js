@@ -9,7 +9,7 @@ const path = `${apiURL}/ingredent`;
 
 const getAll = async (req, res) => {
   try {
-    const allIngredents = await Ingredent.find({ active: 1 });
+    const allIngredents = await Ingredent.find({ active: 1 }).sort({ name: 1 });
     return Response.succes(res, 200, "All ingredents", allIngredents);
   } catch (error) {
     console.error(error);
@@ -21,12 +21,14 @@ const getIngredents = async (req, res) => {
   try {
     let { limit, page } = paginate.getQuery(req);
     const query = getQueryParams(req);
+    const sort = { name: 1 };
 
     const ingredents = await Ingredent.paginate(
       query,
       paginate.getOptions({
         limit,
         page,
+        sort,
       })
     );
 
@@ -91,6 +93,18 @@ const updateIngredent = async (req, res) => {
 
   if (name) name = PascalCase(name);
   try {
+    const prevIngredent = await Ingredent.findById(id);
+
+    if (!prevIngredent)
+      return res.status(404).json({ message: "Ingredent Not Found" });
+
+    if (prevIngredent.name != name) {
+      const foundIngredent = await Ingredent.findOne({ name: name });
+      if (foundIngredent)
+        return res
+          .status(409)
+          .json({ message: "Conflict Ingredent Already Exist" });
+    }
     const updatedIngredent = await Ingredent.findByIdAndUpdate(
       id,
       {

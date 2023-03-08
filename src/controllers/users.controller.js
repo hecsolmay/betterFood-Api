@@ -37,6 +37,16 @@ const getUsers = async (req, res) => {
   }
 };
 
+const getRoles = async (req, res) => {
+  try {
+    const roles = await Role.find({});
+    Response.succes(res, 200, "Lista de Roles", roles);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
 const getUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -114,4 +124,5 @@ module.exports = {
   getUser,
   updateUserRole,
   updateUser,
+  getRoles,
 };

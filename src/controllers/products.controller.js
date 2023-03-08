@@ -277,7 +277,6 @@ function getQueryParams(req) {
 
   if (q) query.name = { $regex: q, $options: "i" };
 
-  console.log(query);
   return query;
 }
 

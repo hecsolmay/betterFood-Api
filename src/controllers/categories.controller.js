@@ -114,6 +114,19 @@ const updateCategory = async (req, res) => {
 
   if (name) name = PascalCase(name);
   try {
+    const prevCategory = await Category.findById(id);
+
+    if (!prevCategory)
+      return res.status(404).json({ message: "Category Not Found" });
+
+    if (prevCategory.name != name) {
+      const foundCategory = await Category.findOne({ name: name });
+      if (foundCategory)
+        return res
+          .status(409)
+          .json({ message: "Conflict Category Already Exist" });
+    }
+
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
       {

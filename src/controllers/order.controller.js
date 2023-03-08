@@ -12,6 +12,13 @@ const getOrders = async (req, res) => {
     let { limit, page } = paginate.getQuery(req);
     const query = getQueryParams(req);
     const sort = getQuerySort();
+    // const populate = [
+    //   {
+    //     path: "products.idProduct",
+    //   },
+    //   { path: "tableId", select: selectTable },
+    //   { path: "waiterId", select: selectWaiter },
+    // ];
 
     const orders = await Order.paginate(
       query,
@@ -26,6 +33,7 @@ const getOrders = async (req, res) => {
     const { results } = orders;
     paginate.success(res, 200, "ok", info, results);
   } catch (error) {
+    console.error(error);
     Response.error(res);
   }
 };
@@ -57,12 +65,12 @@ const getOrder = async (req, res) => {
 
     const { id } = req.params;
     const order = await Order.findById(id).populate([
-      {
-        path: "products.idProduct",
-        select: selectProduct,
-      },
       { path: "tableId", select: selectTable },
       { path: "waiterId", select: selectWaiter },
+      {
+        path: "products.idProduct",
+        populate: { path: "ingredents.id" },
+      },
     ]);
 
     if (!order)
@@ -70,6 +78,7 @@ const getOrder = async (req, res) => {
 
     Response.succes(res, 200, `Orden ${id}`, order);
   } catch (error) {
+    console.error(error);
     Response.error(res);
   }
 };

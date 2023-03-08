@@ -4,19 +4,17 @@ const { Schema, model } = require("mongoose");
  * @swagger
  * components:
  *   schemas:
- *     RoleUpdate:
+ *     RoleResponse:
  *       type: object
  *       properties:
- *        rol: 
+ *        id:
  *          type: string
- *        active:
- *          type: number
- *       example: 
+ *        name:
+ *          type: string
+ *       example:
+ *          id: 65233124Es
  *          name: moderador
- *          active: 0
  */
-
-
 
 const roleSchema = new Schema(
   {
@@ -26,5 +24,12 @@ const roleSchema = new Schema(
     versionKey: false,
   }
 );
+
+roleSchema.set("toJSON", {
+  transform: function (doc, ret) {
+    ret.id = doc._id;
+    delete ret._id;
+  },
+});
 
 module.exports = model("Role", roleSchema);

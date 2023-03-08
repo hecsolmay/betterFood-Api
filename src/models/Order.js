@@ -98,20 +98,12 @@ const Ingredent = require("./Ingredent");
 
 const orderSchema = new Schema(
   {
+    orderNumber: { type: String },
     products: [
       {
         idProduct: { ref: "Product", type: Schema.Types.ObjectId },
-        extras: [
-          {
-            id: { type: Schema.Types.ObjectId, ref: "Ingredent" },
-            extraPrice: { type: Number, default: 0 },
-          },
-        ],
-        remove: [
-          {
-            id: { type: Schema.Types.ObjectId, ref: "Ingredent" },
-          },
-        ],
+        extras: [{ ref: "Ingredent", type: Schema.Types.ObjectId }],
+        remove: [{ ref: "Ingredent", type: Schema.Types.ObjectId }],
         quantity: { type: Number, default: 1 },
       },
     ],
@@ -137,7 +129,8 @@ orderSchema.pre("save", async function () {
     let cantidad = this.products[i].quantity;
     let extra = this.products[i].extras;
 
-    const product = await Product.getProductById(productId);
+    const product = await Product.findById(productId);
+
     let price = product.price;
 
     if (product.ofert !== 0) {
@@ -146,9 +139,19 @@ orderSchema.pre("save", async function () {
     }
 
     if (extra.length !== 0) {
+      const extraIngredents = product.ingredents.map((i) => {
+        let extraPrice = i.extraPrice || 0;
+        return {
+          id: i.id,
+          extraPrice,
+        };
+      });
       for (let i = 0; i < extra.length; i++) {
-        const ingredentExtra = extra[i];
-        price += ingredentExtra.extraPrice;
+        let id = extra[i].toString();
+        let index = extraIngredents.findIndex((i) => i.id == id);
+
+        if (index === -1) return;
+        price += extraIngredents[index].extraPrice;
       }
     }
 
@@ -161,10 +164,18 @@ orderSchema.pre("save", async function () {
   }
   this.total = total;
   this.totalQuantity = totalQuantity;
+
+  if (!this.orderNumber) {
+    const lastOrder = await this.constructor.findOne().sort({ createdAt: -1 });
+    let orderNumber = 1;
+    if (lastOrder) {
+      orderNumber = parseInt(lastOrder.orderNumber.substring(1)) + 1;
+    }
+    this.orderNumber = `#${orderNumber.toString().padStart(3, "0")}`;
+  }
 });
 
 orderSchema.pre("findOneAndDelete", async function () {
-  console.log(this.getFilter());
   const order = await this.model.findOne(this.getFilter());
   const removedSale = await Sale.findOneAndDelete({ order: order._id });
   for (let i = 0; i < order.products.length; i++) {
@@ -175,7 +186,6 @@ orderSchema.pre("findOneAndDelete", async function () {
       $inc: { ordered: -cantidad },
     });
   }
-  console.log(removedSale);
 });
 
 orderSchema.set("toJSON", {
@@ -183,21 +193,78 @@ orderSchema.set("toJSON", {
     ret.id = doc._id;
     if (ret.products.length !== 0) {
       ret.products = doc.products.map((p) => {
-        let extra = undefined;
+        // delete p._id;
+        let extras = undefined;
         let remove = undefined;
+
         if (p.extras.length !== 0) {
-          extra = p.extras.map((e) => {
-            return { id: e.id, extraPrice: e.extraPrice };
-          });
+          if (p.idProduct.ingredents) {
+            const allIngredents = p.idProduct.ingredents;
+            let filteredExtras = allIngredents.filter((i) => {
+              return p.extras.includes(i.id._id);
+            });
+            extras = filteredExtras.map((e) => {
+              return {
+                id: e.id._id,
+                name: e.id.name,
+                extraPrice: e.extraPrice,
+              };
+            });
+          } else {
+            extras = p.extras.map((e) => {
+              let string = e.toString("hex");
+              return string;
+            });
+          }
+        }
+        if (p.remove.length !== 0) {
+          if (p.idProduct.ingredents) {
+            const allIngredents = p.idProduct.ingredents;
+            let filteredExtras = allIngredents.filter((i) => {
+              return p.remove.includes(i.id._id);
+            });
+            remove = filteredExtras.map((e) => {
+              return {
+                id: e.id._id,
+                name: e.id.name,
+              };
+            });
+          } else {
+            remove = p.remove.map((e) => {
+              let string = e.toString("hex");
+              return string;
+            });
+          }
         }
 
-        if (p.remove.length !== 0) {
-          remove = p.remove.map((r) => r.id);
+        // if (p.remove.length !== 0) {
+        //   remove = p.remove.map((e) => {
+        //     let string = e.toString("hex");
+        //     return string;
+        //   });
+        // }
+
+        if (p.idProduct.name) {
+          let product = {
+            id: p.idProduct._id,
+            name: p.idProduct.name,
+            imgURL: p.idProduct.imgURL,
+            description: p.idProduct.description,
+            price: p.idProduct.price,
+            ofert: p.idProduct.ofert,
+          };
+          return {
+            product,
+            quantity: p.quantity,
+            extras,
+            remove,
+          };
         }
+
         return {
-          idProduct: p.idProduct,
+          productId: p.idProduct,
           quantity: p.quantity,
-          extra,
+          extras,
           remove,
         };
       });

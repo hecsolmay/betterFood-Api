@@ -23,6 +23,7 @@ const {
   MobileRoute: tableMobile,
 } = require("./routes/table.routes");
 
+
 const app = express();
 createRoles();
 createAdmin();
@@ -48,6 +49,7 @@ app.use("/api/m/product", ProductMobile);
 app.use("/api/sale", require("./routes/sales.routes"));
 app.use("/api/table", tableAdmin);
 app.use("/api/m/table", tableMobile);
+app.use("/api/role", require("./routes/roles.routes"));
 app.use("/api/user", require("./routes/user.routes"));
 app.use("/api/waiter", WaiterAdmin);
 app.use("/api/m/waiter", WaiterMobile);

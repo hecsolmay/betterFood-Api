@@ -42,8 +42,8 @@ const bcrypt = require("bcryptjs");
  *        - email
  *        - password
  *       example:
- *          email: email@email.com
- *          password: smgk323ls@s23.s
+ *          email: admin@email.com
+ *          password: admin
  *
  *     AuthResponse:
  *       type: object

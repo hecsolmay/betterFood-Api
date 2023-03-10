@@ -1,20 +1,26 @@
 /**
  * @swagger
- * /api/Sale/:
+ * /api/sale/:
  *  get:
  *    summary: Retorna todos las ventas
  *    tags: [Sale]
  *    parameters:
  *      - in: query
- *        name: paid
+ *        name: orderNumber
  *        required: false
- *        description: filtro por status de pagado con numero 1
+ *        description: filtro por numero de orden
  *        schema:
  *          type: number
  *      - in: query
  *        name: date
  *        required: false
- *        description: filtro por fecha en formato dd/mm/yyyy
+ *        description: filtro por fecha en disponibles today,week,month,period,all
+ *        schema:
+ *          type: string 
+ *      - in: query
+ *        name: status
+ *        required: false
+ *        description: filtro por estatus del pedido disponibles all, paid,pending
  *        schema:
  *          type: string 
  *      - in: query
@@ -23,6 +29,44 @@
  *        description: filtro para orderar de mayor a menor apartir de la fecha de creacion con 1 es menor a mayor
  *        schema:
  *          type: number
+ *      - in: query
+ *        name: limit
+ *        required: false
+ *        schema:
+ *          type: number
+ *      - in: query
+ *        name: page
+ *        required: false
+ *        schema:
+ *          type: number
+ *  
+ *    responses:
+ *      200:
+ *        description: Success
+ *        content: 
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/SaleResponse'
+ *      404:
+ *        description: Not Found
+ * 
+ */
+
+/**
+ * @swagger
+ * /api/sale/reports:
+ *  get:
+ *    summary: Retorna todos las ventas
+ *    tags: [reports]
+ *    parameters:
+ *      - in: query
+ *        name: date
+ *        required: false
+ *        description: filtro fecha con formato YYYY-MM-DD
+ *        schema:
+ *          type: string
  *      - in: query
  *        name: limit
  *        required: false

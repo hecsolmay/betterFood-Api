@@ -7,6 +7,7 @@ const router = Router();
 
 router
   .get("/", [verifyToken, canSale], salesController.getSales)
+  .get("/reports", [verifyToken, canSale], salesController.getReports)
   .get("/:id", [verifyToken, canSale], salesController.getSale)
   .put(
     "/:id",

@@ -12,9 +12,8 @@ const getSales = async (req, res) => {
     let { limit, page } = paginate.getQuery(req);
     const { orderNumber } = req.query;
 
-    const query = await getQueryParams(req);
+    const query = getQueryParams(req);
     if (orderNumber) {
-      console.log("Entro");
       let order = `#${orderNumber.padStart(3, "0")}`;
       const categoryId = await getOrderId(order);
       console.log(categoryId);
@@ -31,8 +30,42 @@ const getSales = async (req, res) => {
         { path: "waiterId", select: { name: 1, lastName: 1 } },
       ],
     };
-    console.log(sort);
-    console.log(query);
+    const sales = await Sale.paginate(
+      query,
+      paginate.getOptions({ limit, page, sort, populate })
+    );
+
+    const info = paginate.info(sales, path);
+
+    if (page > info.totalPages)
+      return res.status(404).json({ error: "there is nothing here" });
+
+    const { results } = sales;
+    paginate.success(res, 200, "ok", info, results);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
+const getReports = async (req, res) => {
+  const { date } = req.query;
+  try {
+    let { limit, page } = paginate.getQuery(req);
+    let query = {};
+
+    const sort = { createdAt: 1 };
+    const populate = {
+      path: "order",
+      populate: [
+        { path: "tableId", select: { numMesa: 1 } },
+        { path: "waiterId", select: { name: 1, lastName: 1 } },
+      ],
+    };
+    if (date) {
+      query.createdAt = { $gte: new Date(Date.parse(date)).toISOString() };
+    }
+
     const sales = await Sale.paginate(
       query,
       paginate.getOptions({ limit, page, sort, populate })
@@ -103,10 +136,10 @@ const updateSale = async (req, res) => {
     { new: true, populate: "order" }
   );
 
-  Response.succes(res, 201, `Update sale ${sale._id}`, updatedSale);
+  Response.succes(res, 200, `Update sale ${sale._id}`, updatedSale);
 };
 
-async function getQueryParams(req) {
+function getQueryParams(req) {
   let query = {};
   const { date, status } = req.query;
 
@@ -116,11 +149,15 @@ async function getQueryParams(req) {
     { name: "pending", query: false },
   ];
 
+  let useDate = new Date(Date.now());
+  useDate.setHours(0, 0, 0);
+
   const avalibleDates = [
-    { time: "today", query: moment().subtract(1, "day").toISOString() },
+    { time: "today", query: useDate.toISOString() },
     { time: "week", query: moment().subtract(1, "week").toISOString() },
     { time: "month", query: moment().subtract(1, "months").toISOString() },
     { time: "period", query: moment().subtract(3, "months").toISOString() },
+    { time: "all", query: {} },
   ];
 
   const testDate = moment().subtract(1, "day").toISOString();
@@ -137,9 +174,16 @@ async function getQueryParams(req) {
   const indexDate = avalibleDates.findIndex((d) => d.time === date);
 
   if (indexDate !== -1) {
-    let findDate = avalibleDates[indexDate].query;
-    console.log(findDate);
-    query.createdAt = { $gte: findDate };
+    let findDate = avalibleDates[indexDate];
+    if (findDate.time === "all") {
+      return query;
+    }
+    query.createdAt = { $gte: findDate.query };
+  } else {
+    let useDate = new Date(Date.now());
+    useDate.setHours(0, 0, 0);
+
+    query.createdAt = { $gte: useDate.toISOString() };
   }
   return query;
 }
@@ -154,4 +198,5 @@ module.exports = {
   getSales,
   getSale,
   updateSale,
+  getReports,
 };

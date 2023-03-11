@@ -3,6 +3,8 @@ const Category = require("../models/Category");
 const Order = require("../models/Order");
 const Sale = require("../models/Sale");
 const User = require("../models/User");
+const moment = require("moment/moment");
+
 
 const getData = async (req) => {
   let sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -28,6 +30,11 @@ const getData = async (req) => {
     .populate("categories")
     .sort({ ordered: -1 })
     .limit(10);
+
+    const month = moment().subtract(0, "months").startOf('month').toISOString()
+
+
+    console.log(month);
 
   const totalUsers = await User.count();
 

@@ -12,15 +12,16 @@ const getSales = async (req, res) => {
     let { limit, page } = paginate.getQuery(req);
     const { orderNumber } = req.query;
 
-    const query = getQueryParams(req);
+    const query = await getQueryParams(req);
     if (orderNumber) {
       let order = `#${orderNumber.padStart(3, "0")}`;
-      const categoryId = await getOrderId(order);
-      console.log(categoryId);
-      if (!categoryId) {
+      const orderId = await getOrderId(order);
+      if (!orderId) {
         return res.status(404).json({ message: "Not Found" });
       }
-      query.order = categoryId;
+      delete query.createdAt;
+      delete query.order;
+      query.order = orderId;
     }
     const sort = { createdAt: 1 };
     const populate = {
@@ -30,6 +31,7 @@ const getSales = async (req, res) => {
         { path: "waiterId", select: { name: 1, lastName: 1 } },
       ],
     };
+    console.log(query);
     const sales = await Sale.paginate(
       query,
       paginate.getOptions({ limit, page, sort, populate })
@@ -139,14 +141,37 @@ const updateSale = async (req, res) => {
   Response.succes(res, 200, `Update sale ${sale._id}`, updatedSale);
 };
 
-function getQueryParams(req) {
+const deleteSale = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const saleDeleted = await Sale.findByIdAndUpdate(
+      id,
+      {
+        $set: { canceled: true },
+      },
+      { new: true, populate: "order" }
+    );
+
+    if (!saleDeleted)
+      return res.status(404).json({ message: "Sale Not Found" });
+
+    Response.succes(res, 200, `Venta ${id} cancelada`, saleDeleted);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
+async function getQueryParams(req) {
   let query = {};
   const { date, status } = req.query;
 
   const avalibleStatus = [
     { name: "all", query: {} },
-    { name: "paid", query: true },
-    { name: "pending", query: false },
+    { name: "served", query: "servido" },
+    { name: "pending", query: "pendiente" },
+    { name: "kitchen", query: "cocinando" },
+    { name: "canceled", query: "cancelado" },
   ];
 
   let useDate = new Date(Date.now());
@@ -167,8 +192,13 @@ function getQueryParams(req) {
   const index = avalibleStatus.findIndex((s) => s.name === status);
 
   if (index !== -1 && index !== 0) {
+    const foundOrders = await Order.find({
+      status: avalibleStatus[index].query,
+    });
+    let ids = foundOrders.map((o) => o._id);
+
     console.log("entro");
-    query.paid = avalibleStatus[index].query;
+    query.order = { $in: ids };
   }
 
   const indexDate = avalibleDates.findIndex((d) => d.time === date);
@@ -199,4 +229,5 @@ module.exports = {
   getSale,
   updateSale,
   getReports,
+  deleteSale,
 };

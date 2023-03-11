@@ -109,6 +109,11 @@ const orderSchema = new Schema(
     ],
     totalQuantity: { type: Number },
     waiterId: { ref: "Waiter", type: Schema.Types.ObjectId },
+    status: {
+      type: String,
+      enum: ["pendiente", "cocinando", "servido","cancelado"],
+      default: "pendiente",
+    },
     tableId: { ref: "Table", type: Schema.Types.ObjectId },
     total: { type: Number, default: 0 },
   },
@@ -193,7 +198,6 @@ orderSchema.set("toJSON", {
     ret.id = doc._id;
     if (ret.products.length !== 0) {
       ret.products = doc.products.map((p) => {
-        // delete p._id;
         let extras = undefined;
         let remove = undefined;
 
@@ -236,13 +240,6 @@ orderSchema.set("toJSON", {
             });
           }
         }
-
-        // if (p.remove.length !== 0) {
-        //   remove = p.remove.map((e) => {
-        //     let string = e.toString("hex");
-        //     return string;
-        //   });
-        // }
 
         if (p.idProduct.name) {
           let product = {

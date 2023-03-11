@@ -18,6 +18,19 @@ const verifyStatusDeleteOrder = async (req, res, next) => {
   next();
 };
 
+const verifyOrderStatus = async (req, res, next) => {
+  const { status } = req.body;
+
+  const avalibleStatus = ["pendiente", "cocinando", "servido", "cancelado"];
+
+  let foundStatus = avalibleStatus.find((s) => s === status);
+
+  if (!foundStatus)
+    return res.status(400).json({ message: "Bad request Unvalid Status" });
+
+  next();
+};
+
 const verifyUpdateSale = async (req, res, next) => {
   const { id } = req.params;
 
@@ -30,9 +43,18 @@ const verifyUpdateSale = async (req, res, next) => {
       .status(400)
       .json({ message: "no puedes cambiar una venta pagada" });
 
+  if (sale.canceled)
+    return res
+      .status(400)
+      .json({ message: "No se puede pagar una venta ya cancelada" });
+
   req.sale = sale;
 
   next();
 };
 
-module.exports = { verifyStatusDeleteOrder, verifyUpdateSale };
+module.exports = {
+  verifyStatusDeleteOrder,
+  verifyUpdateSale,
+  verifyOrderStatus,
+};

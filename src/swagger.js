@@ -12,7 +12,7 @@ const swaggerOptions = {
       version: "1.0.0",
       title: "BetterFood API",
       description: "API Documentation",
-    },
+    }, 
     servers: [
       {
         url: "http://localhost:3000",

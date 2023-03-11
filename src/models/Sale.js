@@ -10,7 +10,7 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *       properties:
  *        moneyReceived:
  *          type: number
- *       example: 
+ *       example:
  *          moneyReceived: 450
  *     SaleResponse:
  *       type: object
@@ -19,16 +19,16 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *          type: string
  *        order:
  *          type: object
- *          properties: 
+ *          properties:
  *            products:
  *              type: array
- *              items: 
- *                type: object 
- *                properties: 
+ *              items:
+ *                type: object
+ *                properties:
  *                  idProduct:
- *                    type: string 
+ *                    type: string
  *                  quantity:
- *                    type: number 
+ *                    type: number
  *        numMesa:
  *          type: number
  *        totalQuantity:
@@ -41,11 +41,11 @@ const mongoosePaginate = require("mongoose-paginate-v2");
  *          type: string
  */
 
-
 const saleSchema = new Schema(
   {
     order: { ref: "Order", type: Schema.Types.ObjectId },
     paid: { type: Boolean, default: false },
+    canceled: { type: Boolean, default: false },
     moneyReceived: { type: Number, default: 0 },
   },
   { timestamps: true, versionKey: false }
@@ -64,7 +64,6 @@ saleSchema.plugin(mongoosePaginate);
 
 saleSchema.set("toObject", { getters: true, virtuals: true });
 
-
 saleSchema.set("toJSON", {
   transform: function (doc, ret) {
     ret.id = doc._id;
@@ -72,7 +71,7 @@ saleSchema.set("toJSON", {
     delete ret._id;
   },
   virtuals: true,
-  getters: true
+  getters: true,
 });
 
 module.exports = model("Sale", saleSchema);

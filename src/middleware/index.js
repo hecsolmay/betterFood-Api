@@ -2,7 +2,11 @@ const { verifyToken, canEdit, isAdmin, canSale } = require("./authJwt");
 const { emailExisted } = require("./emailVerification");
 const { checkRoleExisted } = require("./verifySignUp");
 const { checkValidCategory, checkUniqueCategory } = require("./verifyCategory");
-const { verifyStatusDeleteOrder, verifyUpdateSale } = require("./verifyOrder");
+const {
+  verifyStatusDeleteOrder,
+  verifyUpdateSale,
+  verifyOrderStatus,
+} = require("./verifyOrder");
 const {
   checkUniqueIngredent,
   verifyExistingIngredents,
@@ -25,4 +29,5 @@ module.exports = {
   uniqueTable,
   verifyWaiter,
   existedTable,
+  verifyOrderStatus,
 };

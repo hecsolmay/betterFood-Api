@@ -83,16 +83,34 @@ const getOrder = async (req, res) => {
   }
 };
 
-const deleteOrder = async (req, res) => {
+const updateOrder = async (req, res) => {
   const { id } = req.params;
+  const { status } = req.body;
   try {
-    const deletedOrder = await Order.findByIdAndDelete(id);
+    const updatedOrder = await Order.findByIdAndUpdate(
+      id,
+      {
+        $set: { status },
+      },
+      { new: true }
+    );
 
-    if (!deletedOrder)
-      return res.status(400).json({ message: "No se pudo encontrar la orden" });
+    if (!updatedOrder)
+      return res.status(404).json({ message: "Order Not Found" });
 
-    res.status(204).json();
+    if (status === "cancelado") {
+      console.log("Entro a la condicion");
+      const foundSale =await  Sale.findOneAndUpdate(
+        { order: updatedOrder._id },
+        { $set: { canceled: true } },
+        { new: true }
+      );
+
+      console.log(foundSale);
+    }
+    Response.succes(res, 200, `Orden ${id} actualizada`, updatedOrder);
   } catch (error) {
+    console.error(error);
     Response.error(res);
   }
 };
@@ -139,6 +157,6 @@ function getQuerySort() {
 module.exports = {
   getOrders,
   getOrder,
-  deleteOrder,
   postOrder,
+  updateOrder,
 };

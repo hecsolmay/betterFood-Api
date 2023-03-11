@@ -99,29 +99,3 @@
  *       description: Conflict Order already exist
  */
 
-/**
- * @swagger
- * /api/order/{id}:
- *  delete:
- *    summary: Borra una orden
- *    tags: [Order]
- *    parameters:
- *      - in: path
- *        name: id
- *        schema:
- *          type: string
- *        required: true
- *        description: the Order Id
- *    responses:
- *      204:
- *        description: No content
- *      400:
- *        description: Bad Request
- *      401:
- *        description: Unauthorized
- *      403:
- *        description: Forbidden
- *      404:
- *        description: Not Found
- * 
- */

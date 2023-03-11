@@ -59,7 +59,8 @@
  * /api/sale/reports:
  *  get:
  *    summary: Retorna todos las ventas
- *    tags: [reports]
+ *    tags: 
+ *       - Sale
  *    parameters:
  *      - in: query
  *        name: date
@@ -156,4 +157,31 @@
  *       description: Forbidden
  *     404:
  *       description: Not Found
+ */
+
+/**
+ * @swagger
+ * /api/sale/{id}:
+ *  delete:
+ *    summary: Borra una venta
+ *    tags: [Sale]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: the Sale Id
+ *    responses:
+ *      200:
+ *        description: ok
+ *      400:
+ *        description: Bad Request
+ *      401:
+ *        description: Unauthorized
+ *      403:
+ *        description: Forbidden
+ *      404:
+ *        description: Not Found
+ * 
  */

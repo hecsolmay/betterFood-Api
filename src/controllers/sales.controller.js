@@ -178,10 +178,13 @@ async function getQueryParams(req) {
   useDate.setHours(0, 0, 0);
 
   const avalibleDates = [
-    { time: "today", query: useDate.toISOString() },
-    { time: "week", query: moment().subtract(1, "week").toISOString() },
-    { time: "month", query: moment().subtract(1, "months").toISOString() },
-    { time: "period", query: moment().subtract(3, "months").toISOString() },
+    { time: "today", query: moment().startOf("day").toISOString() },
+    { time: "week", query: moment().startOf("week").toISOString() },
+    { time: "month", query: moment().startOf("month").toISOString() },
+    {
+      time: "period",
+      query: moment().subtract(2, "months").startOf("month").toISOString(),
+    },
     { time: "all", query: {} },
   ];
 

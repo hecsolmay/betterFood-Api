@@ -76,6 +76,11 @@ const getSalesMobile = async (req, res) => {
         query.order = { $in: ids };
       }
     }
+
+    query.createdAt = {
+      $gte: moment().startOf("day").toISOString(),
+      $lt: moment().endOf("day").toISOString(),
+    };
     query.canceled = false;
     const sort = { createdAt: 1 };
     const populate = {
@@ -270,7 +275,10 @@ async function getQueryParams(req) {
     let useDate = new Date(Date.now());
     useDate.setHours(0, 0, 0);
 
-    query.createdAt = { $gte: useDate.toISOString() };
+    query.createdAt = {
+      $gte: moment().startOf("day").toISOString(),
+      $lt: moment().endOf("day").toISOString(),
+    };
   }
   return query;
 }

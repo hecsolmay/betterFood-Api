@@ -23,6 +23,10 @@ const {
   MobileRoute: tableMobile,
 } = require("./routes/table.routes");
 
+const {
+  Mobilerouter: salesMobile,
+  router: salesRouter,
+} = require("./routes/sales.routes");
 
 const app = express();
 createRoles();
@@ -46,7 +50,8 @@ app.use("/api/ingredent", require("./routes/ingredents.routes"));
 app.use("/api/order", require("./routes/orders.routes"));
 app.use("/api/product", ProductAdmin);
 app.use("/api/m/product", ProductMobile);
-app.use("/api/sale", require("./routes/sales.routes"));
+app.use("/api/m/sale", salesMobile);
+app.use("/api/sale", salesRouter);
 app.use("/api/table", tableAdmin);
 app.use("/api/m/table", tableMobile);
 app.use("/api/role", require("./routes/roles.routes"));

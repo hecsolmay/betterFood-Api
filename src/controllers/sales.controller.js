@@ -50,6 +50,60 @@ const getSales = async (req, res) => {
   }
 };
 
+const getSalesMobile = async (req, res) => {
+  try {
+    let { limit, page } = paginate.getQuery(req);
+    const { status } = req.query;
+
+    const query = {};
+
+    if (status) {
+      const avalibleStatus = [
+        { name: "served", query: "servido" },
+        { name: "pending", query: "pendiente" },
+        { name: "kitchen", query: "cocinando" },
+      ];
+
+      const index = avalibleStatus.findIndex((s) => s.name === status);
+
+      if (index !== -1 && index !== 0) {
+        const foundOrders = await Order.find({
+          status: avalibleStatus[index].query,
+        });
+        let ids = foundOrders.map((o) => o._id);
+
+        console.log("entro");
+        query.order = { $in: ids };
+      }
+    }
+    query.canceled = false;
+    const sort = { createdAt: 1 };
+    const populate = {
+      path: "order",
+      populate: [
+        { path: "tableId", select: { numMesa: 1, capacity: 1 } },
+        { path: "waiterId", select: { name: 1, lastName: 1 } },
+      ],
+    };
+    console.log(query);
+    const sales = await Sale.paginate(
+      query,
+      paginate.getOptions({ limit, page, sort, populate })
+    );
+
+    const info = paginate.info(sales, path);
+
+    if (page > info.totalPages)
+      return res.status(404).json({ error: "there is nothing here" });
+
+    const { results } = sales;
+    paginate.success(res, 200, "ok", info, results);
+  } catch (error) {
+    console.error(error);
+    Response.error(res);
+  }
+};
+
 const getReports = async (req, res) => {
   const { date } = req.query;
   try {
@@ -233,4 +287,5 @@ module.exports = {
   updateSale,
   getReports,
   deleteSale,
+  getSalesMobile,
 };

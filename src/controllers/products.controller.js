@@ -52,14 +52,19 @@ const getCategoryProducts = async (req, res) => {
   try {
     const { id } = req.params;
     let { limit, page } = paginate.getQuery(req);
+    const populate = [
+      {
+        path: "ingredents.id",
+        match: { active: 1 },
+        select: { _id: 1, name: 1 },
+      },
+    ];
     const selectDTO = {
-      name: 1,
-      imgURL: 1,
-      price: 1,
-      description: 1,
-      _id: 1,
-      ofert: 1,
-      ofertPrice: 1,
+      ordered: 0,
+      active: 0,
+      createdAt: 0,
+      updatedAt: 0,
+      categories: 0,
     };
     const sort = { name: 1 };
     const query = { active: 1, categories: id };
@@ -67,6 +72,7 @@ const getCategoryProducts = async (req, res) => {
     const products = await Product.paginate(
       query,
       paginate.getOptions({
+        populate,
         limit,
         page,
         sort,

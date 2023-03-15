@@ -89,21 +89,36 @@ const getProductsDTO = async (req, res) => {
   try {
     let query = getQueryParams(req);
     let { limit, page } = paginate.getQuery(req);
+    const populate = [
+      {
+        path: "ingredents.id",
+        match: { active: 1 },
+        select: { _id: 1, name: 1 },
+      },
+    ];
     const selectDTO = {
-      name: 1,
-      imgURL: 1,
-      price: 1,
-      description: 1,
-      _id: 1,
-      ofert: 1,
-      ofertPrice: 1,
+      ordered: 0,
+      active: 0,
+      createdAt: 0,
+      updatedAt: 0,
+      categories: 0,
     };
+    // const selectDTO = {
+    //   name: 1,
+    //   imgURL: 1,
+    //   price: 1,
+    //   description: 1,
+    //   _id: 1,
+    //   ofert: 1,
+    //   ofertPrice: 1,
+    // };
     const sort = { name: 1 };
     query = { ...query, active: 1 };
 
     const products = await Product.paginate(
       query,
       paginate.getOptions({
+        populate,
         limit,
         page,
         sort,

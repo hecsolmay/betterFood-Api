@@ -99,8 +99,7 @@ const updateOrder = async (req, res) => {
       return res.status(404).json({ message: "Order Not Found" });
 
     if (status === "cancelado") {
-      console.log("Entro a la condicion");
-      const foundSale =await  Sale.findOneAndUpdate(
+      const foundSale = await Sale.findOneAndUpdate(
         { order: updatedOrder._id },
         { $set: { canceled: true } },
         { new: true }

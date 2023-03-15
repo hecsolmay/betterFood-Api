@@ -21,11 +21,11 @@
  *        required: false
  *        schema:
  *          type: number
- *  
+ *
  *    responses:
  *      200:
  *        description: Success
- *        content: 
+ *        content:
  *          application/json:
  *            schema:
  *              type: array
@@ -33,16 +33,61 @@
  *                $ref: '#/components/schemas/WaiterResponse'
  *      404:
  *        description: Not Found
- * 
+ *
  */
 
+/**
+ * @swagger
+ * /api/waiter/{id}/sales:
+ *  get:
+ *    summary: Retorna todas las ordenes del mesero
+ *    tags:
+ *    - Waiter
+ *    - Mobile
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        schema:
+ *          type: string
+ *        required: true
+ *        description: the Waiter Id
+ *      - in: query
+ *        name: status
+ *        required: false
+ *        description: Los valores aceptados son [pending,kitchen,canceled,served]
+ *        schema:
+ *          type: string
+ *      - in: query
+ *        name: limit
+ *        required: false
+ *        schema:
+ *          type: number
+ *      - in: query
+ *        name: page
+ *        required: false
+ *        schema:
+ *          type: number
+ *
+ *    responses:
+ *      200:
+ *        description: Success
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/WaiterResponse'
+ *      404:
+ *        description: Not Found
+ *
+ */
 
 /**
  * @swagger
  * /api/waiter/{id}:
  *  get:
  *    summary: Retorna un mesero por id
- *    tags: 
+ *    tags:
  *      - Waiter
  *    parameters:
  *      - in: path
@@ -54,23 +99,22 @@
  *    responses:
  *      200:
  *        description: Success
- *        content: 
+ *        content:
  *          application/json:
  *            schema:
  *              type: object
  *              $ref: '#/components/schemas/WaiterResponse'
  *      404:
  *        description: Not Found
- * 
+ *
  */
-
 
 /**
  * @swagger
  * /api/m/waiter/{id}:
  *  get:
  *    summary: Retorna un mesero por id
- *    tags: 
+ *    tags:
  *      - Mobile
  *    parameters:
  *      - in: path
@@ -82,16 +126,15 @@
  *    responses:
  *      200:
  *        description: Success
- *        content: 
+ *        content:
  *          application/json:
  *            schema:
  *              type: object
  *              $ref: '#/components/schemas/WaiterResponseDto'
  *      404:
  *        description: Not Found
- * 
+ *
  */
-
 
 /**
  * @swagger
@@ -109,7 +152,7 @@
  *   responses:
  *     200:
  *       description: Success
- *       content: 
+ *       content:
  *         application/json:
  *           schema:
  *             type: object
@@ -150,9 +193,8 @@
  *        description: Forbidden
  *      404:
  *        description: Not Found
- * 
+ *
  */
-
 
 /**
  * @swagger
@@ -177,7 +219,7 @@
  *   responses:
  *     200:
  *       description: Success
- *       content: 
+ *       content:
  *         application/json:
  *           schema:
  *             type: object

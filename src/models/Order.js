@@ -56,6 +56,12 @@ const Ingredent = require("./Ingredent");
  *                type: number
  *        tableId:
  *          type: number
+ * 
+ *     OrderUpdate:
+ *       type: object
+ *       properties:
+ *        status:
+ *          type: string
  *
  *     OrderDetailResponse:
  *       type: object

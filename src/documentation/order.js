@@ -63,6 +63,41 @@
  * 
  */
 
+/**
+ * @swagger
+ * /api/order/{id}:
+ *  put:
+ *   summary:  Actualiza una orden por id
+ *   tags: 
+ *    - Order
+ *    - Mobile
+ *   requestBody:
+ *    description: "Actualiza es estatus valores aceptados [cocinando,servido,cancelado]"
+ *    required: true
+ *    content:
+ *      application/json:
+ *        schema:
+ *          type: object
+ *          $ref: '#/components/schemas/OrderUpdate'
+ *   parameters:
+ *     - in: path
+ *       name: id
+ *       schema:
+ *         type: string
+ *       required: true
+ *       description: the Order Id
+ *   responses:
+ *     200:
+ *       description: Success
+ *       content: 
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             $ref: '#/components/schemas/OrderDetailResponse'
+ *     404:
+ *       description: Not Found
+  */
+
 
 /**
  * @swagger

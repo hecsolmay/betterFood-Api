@@ -126,7 +126,9 @@
  * /api/Sale/{id}:
  *  put:
  *   summary: Actualizar una venta
- *   tags: [Sale]
+ *   tags: 
+ *    - Sale
+ *    - Mobile
  *   requestBody:
  *     required: true
  *     content:

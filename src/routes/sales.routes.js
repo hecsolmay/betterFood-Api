@@ -3,9 +3,6 @@ const salesController = require("../controllers/sales.controller");
 const { verifyToken, canSale, verifyUpdateSale } = require("../middleware");
 
 const router = Router();
-const Mobilerouter = Router();
-
-Mobilerouter.get("/", salesController.getSalesMobile);
 
 router
   .get("/", salesController.getSales)
@@ -14,4 +11,4 @@ router
   .delete("/:id", [verifyUpdateSale], salesController.deleteSale)
   .put("/:id", [verifyUpdateSale], salesController.updateSale);
 
-module.exports = { router, Mobilerouter };
+module.exports = router;

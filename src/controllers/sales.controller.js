@@ -4,6 +4,7 @@ const paginate = require("../common/paginate");
 const { apiURL } = require("../config/config");
 const moment = require("moment");
 const Order = require("../models/Order");
+const Waiter = require("../models/Waiter");
 
 const path = `${apiURL}/sale`;
 
@@ -51,11 +52,21 @@ const getSales = async (req, res) => {
 };
 
 const getSalesMobile = async (req, res) => {
+  const { id } = req.params;
   try {
     let { limit, page } = paginate.getQuery(req);
     const { status } = req.query;
+    console.log(id);
 
+    let orderIds = [];
     const query = {};
+
+    const foundWaiter = await Waiter.findById(id);
+
+    console.log(foundWaiter);
+
+    if (!foundWaiter)
+      return res.status(404).json({ message: "Waiter Not Found" });
 
     if (status) {
       const avalibleStatus = [
@@ -66,15 +77,18 @@ const getSalesMobile = async (req, res) => {
 
       const index = avalibleStatus.findIndex((s) => s.name === status);
 
-      if (index !== -1 && index !== 0) {
+      if (index !== -1) {
         const foundOrders = await Order.find({
           status: avalibleStatus[index].query,
+          waiterId: id,
         });
-        let ids = foundOrders.map((o) => o._id);
-
-        console.log("entro");
-        query.order = { $in: ids };
+        orderIds = foundOrders.map((o) => o._id);
       }
+    } else {
+      const foundOrders = await Order.find({
+        waiterId: id,
+      });
+      orderIds = foundOrders.map((o) => o._id);
     }
 
     query.createdAt = {
@@ -82,6 +96,7 @@ const getSalesMobile = async (req, res) => {
       $lt: moment().endOf("day").toISOString(),
     };
     query.canceled = false;
+    query.order = { $in: orderIds };
     const sort = { createdAt: 1 };
     const populate = {
       path: "order",

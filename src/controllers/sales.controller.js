@@ -40,11 +40,11 @@ const getSales = async (req, res) => {
     );
 
     const info = paginate.info(sales, path);
+    const { results } = sales;
 
     if (page > info.totalPages)
       return res.status(404).json({ error: "there is nothing here" });
 
-    const { results } = sales;
     paginate.success(res, 200, "ok", info, results);
   } catch (error) {
     console.error(error);
@@ -104,6 +104,7 @@ const getSalesMobile = async (req, res) => {
       populate: [
         { path: "tableId", select: { numMesa: 1, capacity: 1 } },
         { path: "waiterId", select: { name: 1, lastName: 1 } },
+        { path: "products.idProduct" },
       ],
     };
     console.log(query);
@@ -305,6 +306,82 @@ async function getOrderId(orderNumber) {
   return foundCategory._id;
 }
 
+async function getSalesPaginate() {
+  const query = {};
+  query.createdAt = {
+    $gte: moment().startOf("day").toISOString(),
+    $lt: moment().endOf("day").toISOString(),
+  };
+  const limit = 10;
+  const page = 1;
+  const sort = { createdAt: 1 };
+  const populate = {
+    path: "order",
+    populate: [
+      { path: "tableId", select: { numMesa: 1, capacity: 1 } },
+      { path: "waiterId", select: { name: 1, lastName: 1 } },
+      { path: "products.idProduct" },
+    ],
+  };
+  console.log(query);
+  const sales = await Sale.paginate(
+    query,
+    paginate.getOptions({ limit, page, sort, populate })
+  );
+
+  const info = paginate.info(sales, path);
+  const { results } = sales;
+
+  return { info, results };
+}
+
+async function getPaginateSalesMobile(id) {
+  const limit = 10;
+  const page = 1;
+  console.log(id);
+
+  let orderIds = [];
+  const query = {};
+
+  const foundWaiter = await Waiter.findById(id);
+
+  console.log(foundWaiter);
+
+  if (!foundWaiter)
+    return res.status(404).json({ message: "Waiter Not Found" });
+
+  const foundOrders = await Order.find({
+    waiterId: id,
+  });
+  orderIds = foundOrders.map((o) => o._id);
+
+  query.createdAt = {
+    $gte: moment().startOf("day").toISOString(),
+    $lt: moment().endOf("day").toISOString(),
+  };
+  query.canceled = false;
+  query.order = { $in: orderIds };
+  const sort = { createdAt: 1 };
+  const populate = {
+    path: "order",
+    populate: [
+      { path: "tableId", select: { numMesa: 1, capacity: 1 } },
+      { path: "waiterId", select: { name: 1, lastName: 1 } },
+      { path: "products.idProduct" },
+    ],
+  };
+  console.log(query);
+  const sales = await Sale.paginate(
+    query,
+    paginate.getOptions({ limit, page, sort, populate })
+  );
+
+  const info = paginate.info(sales, path);
+  const { results } = sales;
+
+  return { info, results };
+}
+
 module.exports = {
   getSales,
   getSale,
@@ -312,4 +389,6 @@ module.exports = {
   getReports,
   deleteSale,
   getSalesMobile,
+  getSalesPaginate,
+  getPaginateSalesMobile,
 };

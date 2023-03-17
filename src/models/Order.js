@@ -56,7 +56,7 @@ const Ingredent = require("./Ingredent");
  *                type: number
  *        tableId:
  *          type: number
- * 
+ *
  *     OrderUpdate:
  *       type: object
  *       properties:
@@ -117,7 +117,7 @@ const orderSchema = new Schema(
     waiterId: { ref: "Waiter", type: Schema.Types.ObjectId },
     status: {
       type: String,
-      enum: ["pendiente", "cocinando", "servido","cancelado"],
+      enum: ["pendiente", "cocinando", "servido", "cancelado"],
       default: "pendiente",
     },
     tableId: { ref: "Table", type: Schema.Types.ObjectId },

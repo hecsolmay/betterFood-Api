@@ -4,6 +4,10 @@ const Response = require("../common/response");
 const services = require("../services/order.services");
 const paginate = require("../common/paginate");
 const { apiURL } = require("../config/config");
+const {
+  getSalesPaginate,
+  getPaginateSalesMobile,
+} = require("./sales.controller");
 
 const path = `${apiURL}/order`;
 
@@ -12,13 +16,6 @@ const getOrders = async (req, res) => {
     let { limit, page } = paginate.getQuery(req);
     const query = getQueryParams(req);
     const sort = getQuerySort();
-    // const populate = [
-    //   {
-    //     path: "products.idProduct",
-    //   },
-    //   { path: "tableId", select: selectTable },
-    //   { path: "waiterId", select: selectWaiter },
-    // ];
 
     const orders = await Order.paginate(
       query,
@@ -118,6 +115,8 @@ const postOrder = async (req, res) => {
   const { products, tableId, waiterId } = req.body;
 
   try {
+    const { io } = require("../index");
+
     const foundProducts = await services.searchProducts(products);
     if (!foundProducts)
       return res
@@ -130,8 +129,15 @@ const postOrder = async (req, res) => {
     const newSale = new Sale({ order: savedOrder._id });
     await newSale.save();
 
+    const { info, results } = await getSalesPaginate();
+
+    const data = await getPaginateSalesMobile(waiterId);
+
+    io.emit("newOrder", { info, results });
+    io.to(`${waiterId}`).emit("newOrderWaiter", { info: data.info, results: data.results });
     Response.succes(res, 201, "Orden creada", savedOrder);
   } catch (error) {
+    console.error(error);
     Response.error(res);
   }
 };
@@ -152,6 +158,8 @@ function getQuerySort() {
 
   return sort;
 }
+
+function getResultsPaginate() {}
 
 module.exports = {
   getOrders,

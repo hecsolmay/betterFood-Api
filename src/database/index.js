@@ -4,15 +4,13 @@ const Config = require("../config/config");
 
 const connect = () => {
   try {
-    mongoose.connect(
-      Config.mongoUri,
-      // { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true },
-      {},
-      () => {
-        console.log("connected to database");
-      }
-    );
-    // await mongoose.createConnection(Config.mongoUri).asPromise()
+    mongoose.connect(Config.mongoUri, {}, () => {
+      console.log("connected to database");
+    });
+    const db = mongoose.connection;
+    db.once("connected", () => {
+      console.log("Mongoose connection opened.");
+    });
   } catch (error) {
     console.error(error);
   }

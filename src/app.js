@@ -39,18 +39,19 @@ app.get("/", (req, res) => {
 swaggerSetup(app);
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/category", CategoryAdmin);
-app.use("/api/m/category", CategoryMobile);
 app.use("/api/dashboard", require("./routes/dashboard.routes"));
 app.use("/api/ingredent", require("./routes/ingredents.routes"));
+app.use("/api/notification", require("./routes/notification.routes"));
 app.use("/api/order", require("./routes/orders.routes"));
 app.use("/api/product", ProductAdmin);
-app.use("/api/m/product", ProductMobile);
+app.use("/api/role", require("./routes/roles.routes"));
 app.use("/api/sale", require("./routes/sales.routes"));
 app.use("/api/table", tableAdmin);
-app.use("/api/m/table", tableMobile);
-app.use("/api/role", require("./routes/roles.routes"));
 app.use("/api/user", require("./routes/user.routes"));
 app.use("/api/waiter", WaiterAdmin);
+app.use("/api/m/category", CategoryMobile);
+app.use("/api/m/product", ProductMobile);
+app.use("/api/m/table", tableMobile);
 app.use("/api/m/waiter", WaiterMobile);
 app.use("*", (req, res) => {
   res.status(404).json({ message: "Nothing Found Here" });

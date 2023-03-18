@@ -8,6 +8,8 @@ const {
   getSalesPaginate,
   getPaginateSalesMobile,
 } = require("./sales.controller");
+const Notification = require("../models/Notification");
+const Table = require("../models/Table");
 
 const path = `${apiURL}/order`;
 
@@ -37,16 +39,6 @@ const getOrders = async (req, res) => {
 
 const getOrder = async (req, res) => {
   try {
-    const selectProduct = {
-      description: 0,
-      categories: 0,
-      ordered: 0,
-      ingredents: 0,
-      createdAt: 0,
-      updatedAt: 0,
-      active: 0,
-    };
-
     const selectTable = {
       active: 0,
       createdAt: 0,
@@ -133,8 +125,25 @@ const postOrder = async (req, res) => {
 
     const data = await getPaginateSalesMobile(waiterId);
 
+    const foundTable = await Table.findById(tableId);
+
+    const newNotification = new Notification({
+      waiter: waiterId,
+      table: tableId,
+      title: `Nueva Orden en la mesa ${foundTable.numMesa}`,
+      text: `La mesa ${foundTable.numMesa} ha generado una nueva orden`,
+      type: "order",
+    });
+
+    const savedNotification = await newNotification.save();
     io.emit("newOrder", { info, results });
-    io.to(`${waiterId}`).emit("newOrderWaiter", { info: data.info, results: data.results });
+
+    io.to(`${waiterId}`).emit("notification", savedNotification);
+
+    io.to(`${waiterId}`).emit("newOrderWaiter", {
+      info: data.info,
+      results: data.results,
+    });
     Response.succes(res, 201, "Orden creada", savedOrder);
   } catch (error) {
     console.error(error);
@@ -158,8 +167,6 @@ function getQuerySort() {
 
   return sort;
 }
-
-function getResultsPaginate() {}
 
 module.exports = {
   getOrders,

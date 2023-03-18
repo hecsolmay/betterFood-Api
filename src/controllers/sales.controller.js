@@ -375,7 +375,6 @@ async function getPaginateSalesMobile(id) {
     query,
     paginate.getOptions({ limit, page, sort, populate })
   );
-
   const info = paginate.info(sales, path);
   const { results } = sales;
 

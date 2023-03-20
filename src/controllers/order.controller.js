@@ -119,7 +119,7 @@ const postOrder = async (req, res) => {
     let savedOrder = await newOrder.save();
 
     const newSale = new Sale({ order: savedOrder._id });
-    await newSale.save();
+    const savedSale = await newSale.save();
 
     const { info, results } = await getSalesPaginate();
 
@@ -130,6 +130,7 @@ const postOrder = async (req, res) => {
     const newNotification = new Notification({
       waiter: waiterId,
       table: tableId,
+      sale: savedSale.id,
       title: `Nueva Orden en la mesa ${foundTable.numMesa}`,
       text: `La mesa ${foundTable.numMesa} ha generado una nueva orden`,
       type: "order",

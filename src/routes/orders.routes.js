@@ -13,8 +13,8 @@ const {
 const router = Router();
 
 router
-  .get("/", [verifyToken, canSale], orderController.getOrders)
-  .get("/:id", [verifyToken, canSale], orderController.getOrder)
+  .get("/", orderController.getOrders)
+  .get("/:id", orderController.getOrder)
   .put("/:id", verifyOrderStatus, orderController.updateOrder)
   .post("/", [existedTable, verifyWaiter], orderController.postOrder);
 

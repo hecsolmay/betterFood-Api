@@ -42,6 +42,7 @@ const notificationSchema = new Schema(
   {
     table: { ref: "Table", type: Schema.Types.ObjectId },
     waiter: { ref: "Waiter", type: Schema.Types.ObjectId },
+    sale: { ref: "Sale", type: Schema.Types.ObjectId },
     title: { type: String },
     text: { type: String },
     type: { type: String, enum: ["help", "order"], default: "help" },

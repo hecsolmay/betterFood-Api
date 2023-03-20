@@ -37,9 +37,12 @@ const getNotifications = async (req, res) => {
     if (!foundWaiter)
       return res.status(404).json({ message: "Waiter Not Found" });
 
+    const sort = { createdAt: 1 };
+    console.log(sort);
+
     const notifications = await Notification.paginate(
       { waiter: foundWaiter._id },
-      paginate.getOptions({ limit, page })
+      paginate.getOptions({ limit, page, sort: { createdAt: -1 } })
     );
 
     const info = paginate.info(notifications);

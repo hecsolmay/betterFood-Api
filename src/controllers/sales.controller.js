@@ -104,7 +104,7 @@ const getSalesMobile = async (req, res) => {
       populate: [
         { path: "tableId", select: { numMesa: 1, capacity: 1 } },
         { path: "waiterId", select: { name: 1, lastName: 1 } },
-        { path: "products.idProduct" },
+        { path: "products.idProduct", populate: { path: "ingredents.id" } },
       ],
     };
     console.log(query);

@@ -97,6 +97,7 @@ const getSalesMobile = async (req, res) => {
       $lt: moment().endOf("day").toISOString(),
     };
     query.canceled = false;
+    query.paid = false;
     query.order = { $in: orderIds };
     const sort = { createdAt: 1 };
     const populate = {

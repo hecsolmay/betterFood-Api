@@ -52,7 +52,7 @@ const getWaiter = async (req, res) => {
 const getWaiterDto = async (req, res) => {
   try {
     const { id } = req.params;
-    const waiter = await Waiter.findById(id, { name: 1, lastName: 1 });
+    const waiter = await Waiter.findById(id, { updatedAt: 0, active: 0 });
     if (!waiter) Response.error(res, createHttpError.NotFound());
 
     Response.succes(res, 200, `Mesero ${id}`, waiter);

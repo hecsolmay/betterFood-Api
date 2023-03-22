@@ -16,7 +16,8 @@ const swaggerOptions = {
     servers: [
       {
         // url: "http://localhost:3000",
-        url: "https://betterfood-api.up.railway.app",
+        // url: "https://betterfood-api.up.railway.app",
+        url: "https://betterfood.onrender.com",
       },
     ],
     components: {

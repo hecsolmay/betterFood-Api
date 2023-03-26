@@ -76,6 +76,8 @@ const updateOrder = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   try {
+    const { io } = require("../index");
+
     const updatedOrder = await Order.findByIdAndUpdate(
       id,
       {
@@ -96,6 +98,14 @@ const updateOrder = async (req, res) => {
 
       console.log(foundSale);
     }
+
+    io.to(`${updatedOrder.waiterId}`).emit("WaiterUpdatedOrderStatus", {
+      order: updatedOrder,
+    });
+
+    io.emit("updatedStatus", {
+      order: updatedOrder,
+    });
     Response.succes(res, 200, `Orden ${id} actualizada`, updatedOrder);
   } catch (error) {
     console.error(error);

@@ -1,3 +1,4 @@
+require("./database");
 const app = require("./app");
 const SocketIO = require("socket.io");
 
@@ -6,7 +7,6 @@ const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () =>
   console.log(`Server listening on port ${PORT}`)
 );
-require("./database");
 
 const io = SocketIO(server, {
   cors: {
